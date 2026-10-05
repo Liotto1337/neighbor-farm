@@ -1,0 +1,14 @@
+{
+  "products": [
+    { "sku": "coins_small", "title": "Горсть монет", "desc": "+500 монет", "price": "29 ₽", "consumable": true, "grant": { "coins": 500 } },
+    { "sku": "coins_big", "title": "Сундук монет", "desc": "+3000 монет", "price": "129 ₽", "consumable": true, "grant": { "coins": 3000 } },
+    { "sku": "speedup_2h", "title": "Ускорение 2 ч", "desc": "Время на ферме идёт вперёд на 2 часа", "price": "49 ₽", "consumable": true, "grant": { "time_skip_seconds": 7200 } },
+    { "sku": "no_ads", "title": "Без рекламы", "desc": "Отключает рекламу между уровнями", "price": "199 ₽", "consumable": false, "grant": { "no_ads": true } },
+    { "sku": "starter_pack", "title": "Набор новичка", "desc": "1000 монет, 100 семян, 50 корма", "price": "99 ₽", "consumable": false, "grant": { "coins": 1000, "seeds": 100, "feed": 50 } }
+  ],
+  "rewarded": [
+    { "id": "coins", "title": "+50 монет", "placement": "shop", "grant": { "coins": 50 } },
+    { "id": "boost", "title": "Рост ×2 на 10 минут", "placement": "shop", "grant": { "boost_seconds": 600 } },
+    { "id": "trust", "title": "+1 доверие соседу", "placement": "neighbor", "grant": { "trust": 1 } }
+  ]
+}

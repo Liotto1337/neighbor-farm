@@ -1,0 +1,45 @@
+; Engine configuration file.
+; Neighbor Farm — Godot 4.3, mobile portrait 720x1280, Yandex Games (Web + Android).
+
+config_version=5
+
+[application]
+
+config/name="Neighbor Farm"
+run/main_scene="res://scenes/Main.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+
+[autoload]
+
+Signals="*res://autoload/Signals.gd"
+Economy="*res://autoload/Economy.gd"
+TimeService="*res://autoload/TimeService.gd"
+NeighborAI="*res://autoload/NeighborAI.gd"
+GameState="*res://autoload/GameState.gd"
+SaveManager="*res://autoload/SaveManager.gd"
+IAP="*res://autoload/IAP.gd"
+AdManager="*res://autoload/AdManager.gd"
+
+[debug]
+
+gdscript/warnings/unused_signal=0
+
+[display]
+
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/size/window_width_override=450
+window/size/window_height_override=800
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[gui]
+
+theme/custom="res://theme/main_theme.tres"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true

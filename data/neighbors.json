@@ -1,0 +1,29 @@
+{
+  "count": 8,
+  "names": ["Бабушка Нина", "Дядя Ваня", "Агроном Петрович", "Маша-фермерша", "Тётя Люба", "Кузнец Гриша", "Оля с пасеки", "Дед Матвей", "Света-садовод", "Лёша-тракторист", "Зина с хутора", "Фёдор Ильич"],
+  "farm_palette": ["#6aa84f", "#7a5230", "#e8c547", "#f08a24", "#e0412f", "#5c3b20", "#ffd31a", "#8fc46b"],
+  "visit_grid": 6,
+  "trust_start": 10,
+  "trust_max": 100,
+  "trust_decay_per_hour": 1,
+  "first_request_seconds": [5, 90],
+  "request_interval_seconds": [180, 900],
+  "request_lifetime_seconds": 1800,
+  "request_types": [
+    { "id": "water", "title": "полить грядки", "cost_feed": 0, "reward_coins": 15, "reward_xp": 3, "trust": 5 },
+    { "id": "feed", "title": "покормить животных", "cost_feed": 2, "reward_coins": 30, "reward_xp": 6, "trust": 8 }
+  ],
+  "gift_interval_seconds": 1200,
+  "gift_tiers": [
+    { "min_trust": 0, "seeds": 3 },
+    { "min_trust": 30, "seeds": 8 },
+    { "min_trust": 60, "seeds": 15 },
+    { "min_trust": 90, "seeds": 25 }
+  ],
+  "offer_interval_seconds": [300, 1200],
+  "offer_lifetime_seconds": 1800,
+  "offer_qty": [3, 10],
+  "offer_price_multiplier": 1.5,
+  "offer_trust": 2,
+  "contract_rate_per_hour": [0.1, 0.35]
+}

@@ -1,0 +1,6 @@
+{
+  "animals": [
+    { "id": "chicken", "name": "Курица", "cost": 50, "unlock_level": 3, "product": "egg", "product_name": "Яйцо", "produce_minutes": 2, "feed_cost": 1, "sell_price": 12, "xp": 2, "color": "#fff3d6" },
+    { "id": "cow", "name": "Корова", "cost": 200, "unlock_level": 5, "product": "milk", "product_name": "Молоко", "produce_minutes": 5, "feed_cost": 3, "sell_price": 35, "xp": 5, "color": "#f4f4f4" }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "save_version": 1,
+  "grid_size": 10,
+  "tick_seconds": 60,
+  "ui_refresh_seconds": 1.0,
+  "autosave_seconds": 15.0,
+  "storage_base": 200,
+  "wither_multiplier": 3.0,
+  "offline_cap_seconds": 28800,
+  "welcome_min_seconds": 60,
+  "boost_growth_multiplier": 0.5,
+  "feed_source_item": "corn",
+  "feed_per_corn": 2,
+  "seed_pack": { "seeds": 10, "cost": 15 },
+  "start": { "coins": 150, "seeds": 30, "feed": 4, "level": 1, "xp": 0, "crop": "wheat" },
+  "debug": { "fast_forward_seconds": 60, "grant_coins": 1000, "grant_xp": 100 },
+  "ui": {
+    "tile_size": 64,
+    "tile_gap": 4,
+    "crop_min_fraction": 0.25,
+    "crop_max_fraction": 0.8,
+    "button_height": 64,
+    "row_button_width": 200,
+    "modal_content_width": 600,
+    "visit_cell": 64,
+    "visit_gap": 4,
+    "trust_bar_height": 14,
+    "toast_seconds": 1.6,
+    "toast_fade_seconds": 0.4
+  },
+  "colors": {
+    "bg": "#3d5c2f",
+    "grass": "#6aa84f",
+    "plowed": "#7a5230",
+    "planted": "#5c3b20",
+    "withered": "#77705a",
+    "ready_text": "#fff27a",
+    "letter": "#2b1d0e"
+  }
+}

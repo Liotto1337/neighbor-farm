@@ -1,0 +1,10 @@
+{
+  "crops": [
+    { "id": "wheat", "name": "Пшеница", "grow_minutes": 1, "seed_cost": 1, "sell_price": 4, "xp": 1, "yield": 1, "unlock_level": 1, "color": "#e8c547" },
+    { "id": "carrot", "name": "Морковь", "grow_minutes": 2, "seed_cost": 2, "sell_price": 8, "xp": 2, "yield": 1, "unlock_level": 2, "color": "#f08a24" },
+    { "id": "corn", "name": "Кукуруза", "grow_minutes": 3, "seed_cost": 2, "sell_price": 10, "xp": 3, "yield": 2, "unlock_level": 3, "color": "#f5e050" },
+    { "id": "tomato", "name": "Томат", "grow_minutes": 5, "seed_cost": 3, "sell_price": 18, "xp": 4, "yield": 1, "unlock_level": 4, "color": "#e0412f" },
+    { "id": "pumpkin", "name": "Тыква", "grow_minutes": 8, "seed_cost": 5, "sell_price": 32, "xp": 7, "yield": 1, "unlock_level": 6, "color": "#e07b1f" },
+    { "id": "sunflower", "name": "Подсолнух", "grow_minutes": 12, "seed_cost": 6, "sell_price": 45, "xp": 10, "yield": 1, "unlock_level": 8, "color": "#ffd31a" }
+  ]
+}

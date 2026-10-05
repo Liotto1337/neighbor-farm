@@ -1,0 +1,125 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/scripts/NeighborsView.gd" id="1_neighbors"]
+[ext_resource type="PackedScene" path="res://scenes/components/ContractRow.tscn" id="2_contract"]
+
+[node name="NeighborsView" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_neighbors")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="ListPanel" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Margin/ListPanel"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Соседи"
+
+[node name="ContractRow" parent="Margin/ListPanel" instance=ExtResource("2_contract")]
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/ListPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="List" type="VBoxContainer" parent="Margin/ListPanel/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="VisitPanel" type="VBoxContainer" parent="Margin"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Margin/VisitPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Back" type="Button" parent="Margin/VisitPanel/Header"]
+custom_minimum_size = Vector2(140, 60)
+layout_mode = 2
+text = "< Назад"
+
+[node name="Name" type="Label" parent="Margin/VisitPanel/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "Сосед"
+
+[node name="Farm" type="CenterContainer" parent="Margin/VisitPanel"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="Margin/VisitPanel/Farm"]
+layout_mode = 2
+
+[node name="Trust" type="Label" parent="Margin/VisitPanel"]
+layout_mode = 2
+text = "Доверие"
+
+[node name="TrustBar" type="ProgressBar" parent="Margin/VisitPanel"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+show_percentage = false
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/VisitPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Actions" type="VBoxContainer" parent="Margin/VisitPanel/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Request" type="Label" parent="Margin/VisitPanel/Scroll/Actions"]
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Help" type="Button" parent="Margin/VisitPanel/Scroll/Actions"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "Помочь"
+
+[node name="Gift" type="Label" parent="Margin/VisitPanel/Scroll/Actions"]
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="GiftButton" type="Button" parent="Margin/VisitPanel/Scroll/Actions"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "Забрать подарок"
+
+[node name="Offer" type="Label" parent="Margin/VisitPanel/Scroll/Actions"]
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="OfferButton" type="Button" parent="Margin/VisitPanel/Scroll/Actions"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "Продать соседу"
+
+[node name="AdTrust" type="Button" parent="Margin/VisitPanel/Scroll/Actions"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+text = "Реклама: +доверие"

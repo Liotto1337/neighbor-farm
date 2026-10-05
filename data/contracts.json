@@ -1,0 +1,9 @@
+{
+  "duration_seconds": 604800,
+  "contracts": [
+    { "id": "bread_convoy", "title": "Хлебный обоз", "desc": "Всем соседством сдать 500 пшеницы на мельницу.", "item": "wheat", "target": 500, "reward": { "coins": 400, "xp": 80, "seeds": 60 } },
+    { "id": "carrot_fest", "title": "Морковный фестиваль", "desc": "Собрать 300 морковок к празднику.", "item": "carrot", "target": 300, "reward": { "coins": 500, "xp": 100, "seeds": 60 } },
+    { "id": "corn_record", "title": "Кукурузный рекорд", "desc": "Сдать 400 кукурузы на районную ярмарку.", "item": "corn", "target": 400, "reward": { "coins": 600, "xp": 120, "feed": 60 } },
+    { "id": "egg_fair", "title": "Яичная ярмарка", "desc": "Привезти 150 яиц в деревенскую пекарню.", "item": "egg", "target": 150, "reward": { "coins": 700, "xp": 140, "seeds": 80 } }
+  ]
+}

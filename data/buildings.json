@@ -1,0 +1,8 @@
+{
+  "buildings": [
+    { "id": "barn", "name": "Амбар", "desc": "Открывает животных. Каждый уровень: +3 места.", "unlock_level": 3, "xp": 10, "costs": [100, 300, 800], "params": { "animals_per_level": 3 } },
+    { "id": "silo", "name": "Силос", "desc": "Каждый уровень: +300 к вместимости склада.", "unlock_level": 2, "xp": 10, "costs": [150, 400, 900, 1600, 2500], "params": { "storage_per_level": 300 } },
+    { "id": "workshop", "name": "Мастерская", "desc": "Перерабатывает урожай в семена.", "unlock_level": 3, "xp": 10, "costs": [120, 350, 700], "params": { "seeds_per_item_per_level": 1 } },
+    { "id": "market_stall", "name": "Прилавок", "desc": "Сам продаёт излишки раз в 5 минут.", "unlock_level": 4, "xp": 15, "costs": [200, 500, 1000], "params": { "interval_seconds": 300, "items_per_level": 2, "price_multiplier": 0.8 } }
+  ]
+}
