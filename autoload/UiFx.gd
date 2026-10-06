@@ -1,9 +1,13 @@
 extends Node
-## UI motion: press feedback for every button in the tree, plus small tween helpers
-## (floating "+N" text, colour flash). Timings live in config.json "anim".
+## UI motion and sound: press feedback and a click for every button in the tree, plus small
+## tween helpers (floating "+N" text, colour flash). Timings live in config.json "anim".
 
 ## Buttons with this meta set animate themselves (e.g. farm tiles draw their own squash).
 const SKIP_META: StringName = &"fx_skip"
+## Sound id a button plays when pressed instead of "click"; "" keeps it silent (the action it
+## triggers has its own sound, e.g. tabs and the modal close button).
+const SFX_META: StringName = &"fx_sfx"
+const DEFAULT_SFX: String = "click"
 const FLOAT_FONT_SIZE: int = 24
 const FLOAT_OUTLINE: int = 6
 const FLOAT_OUTLINE_COLOR: Color = Color(0.16, 0.1, 0.04, 0.9)
@@ -20,6 +24,13 @@ func _on_node_added(node: Node) -> void:
 		var button: BaseButton = node
 		button.button_down.connect(_on_button_down.bind(button))
 		button.button_up.connect(_on_button_up.bind(button))
+		button.pressed.connect(_on_button_pressed.bind(button))
+
+
+func _on_button_pressed(button: BaseButton) -> void:
+	var sound_id: String = str(button.get_meta(SFX_META)) if button.has_meta(SFX_META) else DEFAULT_SFX
+	if not sound_id.is_empty():
+		Audio.play(sound_id)
 
 
 func _on_button_down(button: BaseButton) -> void:

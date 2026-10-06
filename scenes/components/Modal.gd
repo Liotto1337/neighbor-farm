@@ -15,6 +15,7 @@ var _tween: Tween = null
 
 
 func _ready() -> void:
+	_close_button.set_meta(UiFx.SFX_META, "")
 	_close_button.pressed.connect(close)
 	_panel.resized.connect(func() -> void: _panel.pivot_offset = _panel.size * 0.5)
 	Signals.currencies_changed.connect(_queue_rebuild.unbind(3))

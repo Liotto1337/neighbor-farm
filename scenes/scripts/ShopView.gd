@@ -1,21 +1,27 @@
 extends Control
-## Shop tab: rewarded-ad offers and IAP products (all via IAP / AdManager stubs).
+## Shop tab: rewarded-ad offers and IAP products (all via IAP / AdManager stubs), plus the
+## music / sound toggles at the bottom.
 
 const TAB_ID: String = "shop"
 const SHOP_PLACEMENT: String = "shop"
+const SECTION_FONT_SIZE: int = 26
 const Fmt = preload("res://scenes/scripts/Fmt.gd")
 
 var _product_buttons: Dictionary = {}
+var _music_toggle: Button = null
+var _sfx_toggle: Button = null
 
 @onready var _status: Label = $Margin/Scroll/VBox/Status
 @onready var _ads: VBoxContainer = $Margin/Scroll/VBox/Ads
 @onready var _products: VBoxContainer = $Margin/Scroll/VBox/Products
 @onready var _restore: Button = $Margin/Scroll/VBox/Restore
+@onready var _vbox: VBoxContainer = $Margin/Scroll/VBox
 
 
 func _ready() -> void:
 	_build_ads()
 	_build_products()
+	_build_settings()
 	_restore.pressed.connect(IAP.restore)
 	Signals.tab_requested.connect(_on_tab)
 	Signals.clock_tick.connect(_on_clock)
@@ -45,6 +51,35 @@ func _build_products() -> void:
 		button.pressed.connect(func() -> void: Signals.modal_requested.emit("iap_confirm", {"sku": sku}))
 		_products.add_child(button)
 		_product_buttons[sku] = button
+
+
+func _build_settings() -> void:
+	_vbox.add_child(HSeparator.new())
+	var title: Label = Label.new()
+	title.text = "Настройки"
+	title.add_theme_font_size_override("font_size", SECTION_FONT_SIZE)
+	_vbox.add_child(title)
+	_music_toggle = _add_toggle(Audio.set_music_on)
+	_sfx_toggle = _add_toggle(Audio.set_sfx_on)
+	Audio.settings_changed.connect(_refresh_settings)
+	_refresh_settings()
+
+
+func _add_toggle(setter: Callable) -> Button:
+	var button: Button = Button.new()
+	button.toggle_mode = true
+	button.theme_type_variation = &"ButtonBlue"
+	button.custom_minimum_size.y = Economy.ui_i("button_height")
+	button.toggled.connect(setter)
+	_vbox.add_child(button)
+	return button
+
+
+func _refresh_settings() -> void:
+	_music_toggle.set_pressed_no_signal(Audio.music_on)
+	_sfx_toggle.set_pressed_no_signal(Audio.sfx_on)
+	_music_toggle.text = "Музыка: %s" % ("вкл" if Audio.music_on else "выкл")
+	_sfx_toggle.text = "Звуки: %s" % ("вкл" if Audio.sfx_on else "выкл")
 
 
 func _on_tab(tab_id: String) -> void:

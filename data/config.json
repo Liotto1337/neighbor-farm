@@ -67,6 +67,23 @@
     "flash_seconds": 0.35,
     "xp_bar_seconds": 0.4
   },
+  "audio": {
+    "music_db": -9.0,
+    "sfx_db": -4.0,
+    "music_fade_seconds": 3.0,
+    "duck_db": -6.0,
+    "duck_seconds": 0.4,
+    "sfx_voices": 10,
+    "pitch_jitter": 0.06,
+    "repeat_guard_seconds": 0.05,
+    "bird_db": -20.0,
+    "bird_interval_seconds": [9, 26],
+    "volumes_db": {
+      "click": -9.0, "tab": -6.0, "modal_open": -7.0, "modal_close": -8.0, "deny": -10.0,
+      "plow": -5.0, "plant": -6.0, "harvest": -4.0, "clear": -6.0, "tock": -9.0,
+      "coin": -8.0, "build": -5.0, "level_up": -3.0, "expand": -4.0
+    }
+  },
   "colors": {
     "bg": "#3d5c2f",
     "grass": "#6aa84f",

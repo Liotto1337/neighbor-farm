@@ -22,6 +22,8 @@ var _side: int = 0
 
 func _ready() -> void:
 	_build_grid()
+	for button: Button in [_plant_all, _harvest_all]:
+		button.set_meta(UiFx.SFX_META, "")
 	_crop_button.pressed.connect(_open_modal.bind("plant_picker"))
 	_build_button.pressed.connect(_open_modal.bind("build_menu"))
 	_plant_all.pressed.connect(_on_plant_all)
@@ -123,26 +125,33 @@ func _on_plant_all() -> void:
 	if GameState.selected_crop.is_empty():
 		_open_modal("plant_picker")
 		return
-	GameState.plant_all(GameState.selected_crop)
+	_sound(GameState.plant_all(GameState.selected_crop) > 0, "plant")
 
 
 func _on_tile_tapped(index: int) -> void:
 	var state: int = GameState.tile_state(index)
 	if state == GameState.TileState.EMPTY:
-		GameState.plow(index)
+		_sound(GameState.plow(index), "plow")
 	elif state == GameState.TileState.PLOWED:
 		if GameState.selected_crop.is_empty():
 			_open_modal("plant_picker")
 		else:
-			GameState.plant(index, GameState.selected_crop)
+			_sound(GameState.plant(index, GameState.selected_crop), "plant")
 	elif state == GameState.TileState.PLANTED:
+		Audio.play("tock")
 		_toast_growing(index)
 	elif state == GameState.TileState.READY:
 		var crop_id: String = str(GameState.tile(index)["c"])
-		if GameState.harvest(index):
+		if _sound(GameState.harvest(index), "harvest"):
 			_float_yield(index, crop_id)
 	elif state == GameState.TileState.WITHERED:
-		GameState.clear_tile(index)
+		_sound(GameState.clear_tile(index), "clear")
+
+
+## Plays the action's sound on success, a soft "nope" otherwise; passes `ok` through.
+func _sound(ok: bool, sound_id: String) -> bool:
+	Audio.play(sound_id if ok else "deny")
+	return ok
 
 
 func _on_harvest_all() -> void:
@@ -150,8 +159,11 @@ func _on_harvest_all() -> void:
 	for i: int in _tiles.size():
 		if GameState.tile_state(i) == GameState.TileState.READY and GameState.is_tile_open(i):
 			ready[i] = str(GameState.tile(i)["c"])
-	if GameState.harvest_all() <= 0:
+	var harvested: int = GameState.harvest_all()
+	if harvested <= 0:
+		Audio.play("deny")
 		return
+	Audio.play_harvest_many(harvested)
 	var shown: int = 0
 	for i: int in ready:
 		if shown >= int(Economy.anim_f("float_text_limit")):

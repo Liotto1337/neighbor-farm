@@ -77,6 +77,7 @@ func _setup_tabs() -> void:
 	for i: int in mini(buttons.size(), TABS.size()):
 		var button: Button = buttons[i]
 		button.toggle_mode = true
+		button.set_meta(UiFx.SFX_META, "")
 		button.button_group = group
 		button.pressed.connect(_on_tab_pressed.bind(TABS[i]))
 	(buttons[0] as Button).button_pressed = true
@@ -133,6 +134,8 @@ func _roll_counter(key: String, value: int) -> void:
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	if value > from:
 		UiFx.flash(_counter_label(key))
+		if key == "coins":
+			Audio.play("coin")
 
 
 func _set_counter(shown: float, key: String) -> void:
