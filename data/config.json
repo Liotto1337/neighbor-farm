@@ -16,7 +16,10 @@
   "debug": { "fast_forward_seconds": 60, "grant_coins": 1000, "grant_xp": 100 },
   "ui": {
     "tile_size": 64,
-    "tile_gap": 4,
+    "tile_gap": 2,
+    "tile_top_ratio": 0.75,
+    "tile_depth": 12,
+    "field_top_margin": 40,
     "crop_min_fraction": 0.25,
     "crop_max_fraction": 0.8,
     "button_height": 64,
@@ -35,6 +38,7 @@
     "planted": "#5c3b20",
     "withered": "#77705a",
     "ready_text": "#fff27a",
-    "letter": "#2b1d0e"
+    "letter": "#2b1d0e",
+    "leaf": "#4f9a3a"
   }
 }

@@ -66,6 +66,9 @@ autowrap_mode = 3
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Grid" type="GridContainer" parent="VBox/Center"]
+[node name="Field" type="MarginContainer" parent="VBox/Center"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="VBox/Center/Field"]
 layout_mode = 2
 columns = 10

@@ -13,7 +13,8 @@ var _tiles: Array = []
 @onready var _plant_all: Button = $VBox/ToolbarBottom/PlantAll
 @onready var _harvest_all: Button = $VBox/ToolbarBottom/HarvestAll
 @onready var _info: Label = $VBox/Info
-@onready var _grid: GridContainer = $VBox/Center/Grid
+@onready var _field: MarginContainer = $VBox/Center/Field
+@onready var _grid: GridContainer = $VBox/Center/Field/Grid
 
 
 func _ready() -> void:
@@ -34,6 +35,8 @@ func _build_grid() -> void:
 	var side: int = Economy.cfg_i("grid_size")
 	var gap: int = Economy.ui_i("tile_gap")
 	_grid.columns = side
+	# Headroom so tall plants in the first row are not drawn over the info label.
+	_field.add_theme_constant_override("margin_top", Economy.ui_i("field_top_margin"))
 	_grid.add_theme_constant_override("h_separation", gap)
 	_grid.add_theme_constant_override("v_separation", gap)
 	for i: int in side * side:
