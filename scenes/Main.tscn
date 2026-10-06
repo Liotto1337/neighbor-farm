@@ -12,11 +12,16 @@ content_margin_left = 16.0
 content_margin_top = 10.0
 content_margin_right = 16.0
 content_margin_bottom = 10.0
-bg_color = Color(0.1, 0.08, 0.05, 0.88)
+bg_color = Color(0.16, 0.11, 0.06, 0.92)
+border_width_bottom = 4
+border_color = Color(0.96, 0.65, 0.14, 1)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -27,7 +32,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="Bg" type="ColorRect" parent="."]
+[node name="Bg" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -35,7 +40,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.24, 0.36, 0.18, 1)
+expand_mode = 1
 
 [node name="Root" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -47,6 +52,7 @@ grow_vertical = 2
 theme_override_constants/separation = 0
 
 [node name="TopBar" type="PanelContainer" parent="Root"]
+theme_type_variation = &"TopBar"
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 
@@ -55,6 +61,7 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="Coins" type="Label" parent="Root/TopBar/HBox"]
+theme_type_variation = &"ChipCoins"
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
@@ -63,6 +70,7 @@ text = "Монеты
 horizontal_alignment = 1
 
 [node name="Seeds" type="Label" parent="Root/TopBar/HBox"]
+theme_type_variation = &"ChipSeeds"
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
@@ -71,6 +79,7 @@ text = "Семена
 horizontal_alignment = 1
 
 [node name="Feed" type="Label" parent="Root/TopBar/HBox"]
+theme_type_variation = &"ChipFeed"
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
@@ -85,12 +94,14 @@ size_flags_stretch_ratio = 1.4
 alignment = 1
 
 [node name="Level" type="Label" parent="Root/TopBar/HBox/LevelBox"]
+theme_type_variation = &"ChipLevel"
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Уровень 1"
 horizontal_alignment = 1
 
 [node name="XpBar" type="ProgressBar" parent="Root/TopBar/HBox/LevelBox"]
+theme_type_variation = &"XpBar"
 custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 show_percentage = false
@@ -121,6 +132,7 @@ layout_mode = 2
 theme_override_constants/separation = 2
 
 [node name="FarmTab" type="Button" parent="Root/TabBar"]
+theme_type_variation = &"TabButton"
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -128,6 +140,7 @@ theme_override_font_sizes/font_size = 20
 text = "Ферма"
 
 [node name="AnimalsTab" type="Button" parent="Root/TabBar"]
+theme_type_variation = &"TabButton"
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -135,6 +148,7 @@ theme_override_font_sizes/font_size = 20
 text = "Животные"
 
 [node name="MarketTab" type="Button" parent="Root/TabBar"]
+theme_type_variation = &"TabButton"
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -142,6 +156,7 @@ theme_override_font_sizes/font_size = 20
 text = "Рынок"
 
 [node name="NeighborsTab" type="Button" parent="Root/TabBar"]
+theme_type_variation = &"TabButton"
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
@@ -149,6 +164,7 @@ theme_override_font_sizes/font_size = 20
 text = "Соседи"
 
 [node name="ShopTab" type="Button" parent="Root/TabBar"]
+theme_type_variation = &"TabButton"
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0

@@ -9,6 +9,7 @@ flat = true
 script = ExtResource("1_tile")
 
 [node name="Bar" type="ProgressBar" parent="."]
+theme_type_variation = &"TileBar"
 visible = false
 layout_mode = 1
 anchors_preset = 12

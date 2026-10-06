@@ -59,6 +59,7 @@ func _build_rows() -> void:
 
 func _make_row(index: int, display_name: String) -> Dictionary:
 	var panel: PanelContainer = PanelContainer.new()
+	panel.theme_type_variation = &"Card"
 	var hbox: HBoxContainer = HBoxContainer.new()
 	var info: VBoxContainer = VBoxContainer.new()
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -69,6 +70,7 @@ func _make_row(index: int, display_name: String) -> Dictionary:
 	var bar: ProgressBar = _make_trust_bar()
 	var visit: Button = Button.new()
 	visit.text = "В гости"
+	visit.theme_type_variation = &"ButtonBlue"
 	visit.custom_minimum_size = Vector2(Economy.ui_i("row_button_width"), Economy.ui_i("button_height"))
 	visit.pressed.connect(func() -> void: Signals.neighbor_visit_requested.emit(index))
 	info.add_child(name_label)
@@ -83,6 +85,7 @@ func _make_row(index: int, display_name: String) -> Dictionary:
 
 func _make_trust_bar() -> ProgressBar:
 	var bar: ProgressBar = ProgressBar.new()
+	bar.theme_type_variation = &"TrustBar"
 	bar.max_value = float(Economy.neighbor_cfg("trust_max"))
 	bar.show_percentage = false
 	bar.custom_minimum_size.y = Economy.ui_i("trust_bar_height")

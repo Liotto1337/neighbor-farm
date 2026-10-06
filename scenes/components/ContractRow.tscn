@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scenes/components/ContractRow.gd" id="1_row"]
 
 [node name="ContractRow" type="PanelContainer"]
+theme_type_variation = &"Card"
 script = ExtResource("1_row")
 
 [node name="VBox" type="VBoxContainer" parent="."]
@@ -29,6 +30,7 @@ layout_mode = 2
 autowrap_mode = 3
 
 [node name="Details" type="Button" parent="VBox"]
+theme_type_variation = &"ButtonBlue"
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 text = "Подробнее"

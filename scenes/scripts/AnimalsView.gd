@@ -30,6 +30,7 @@ func _build_shop() -> void:
 	for def: Variant in Economy.animals_list():
 		var id: String = str(def["id"])
 		var button: Button = Button.new()
+		button.theme_type_variation = &"ButtonBlue"
 		button.custom_minimum_size.y = Economy.ui_i("button_height")
 		button.pressed.connect(GameState.buy_animal.bind(id))
 		_shop.add_child(button)

@@ -47,6 +47,7 @@ size_flags_horizontal = 3
 autowrap_mode = 3
 
 [node name="MakeFeed" type="Button" parent="Margin/VBox/FeedRow"]
+theme_type_variation = &"ButtonGold"
 custom_minimum_size = Vector2(260, 64)
 layout_mode = 2
 text = "Корм из кукурузы"

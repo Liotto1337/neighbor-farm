@@ -14,7 +14,7 @@ var _tiles: Array = []
 @onready var _harvest_all: Button = $VBox/ToolbarBottom/HarvestAll
 @onready var _info: Label = $VBox/Info
 @onready var _field: MarginContainer = $VBox/Center/Field
-@onready var _grid: GridContainer = $VBox/Center/Field/Grid
+@onready var _grid: GridContainer = $VBox/Center/Field/Plate/Grid
 
 
 func _ready() -> void:

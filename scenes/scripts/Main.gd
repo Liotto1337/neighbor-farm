@@ -6,12 +6,13 @@ const ModalScript = preload("res://scenes/components/Modal.gd")
 const ModalFactory = preload("res://scenes/scripts/ModalFactory.gd")
 const TABS: Array[String] = ["farm", "animals", "market", "neighbors", "shop"]
 const NEIGHBORS_TAB_TITLE: String = "Соседи"
+const BG_GRADIENT_HEIGHT: int = 256
 
 var _factory: ModalFactory = ModalFactory.new()
 var _modal_stack: Array = []
 var _toast_tween: Tween = null
 
-@onready var _bg: ColorRect = $Bg
+@onready var _bg: TextureRect = $Bg
 @onready var _coins: Label = $Root/TopBar/HBox/Coins
 @onready var _seeds: Label = $Root/TopBar/HBox/Seeds
 @onready var _feed: Label = $Root/TopBar/HBox/Feed
@@ -24,13 +25,27 @@ var _toast_tween: Tween = null
 
 
 func _ready() -> void:
-	_bg.color = Economy.color("bg")
+	_bg.texture = _make_bg_gradient()
 	_toast.modulate.a = 0.0
 	_connect_signals()
 	_setup_tabs()
 	var had_save: bool = SaveManager.load_or_create()
 	TimeService.start(had_save)
 	Signals.tab_requested.emit(TABS[0])
+
+
+## Vertical sky-to-ground gradient behind everything (top/middle/bottom from config colors).
+func _make_bg_gradient() -> GradientTexture2D:
+	var gradient: Gradient = Gradient.new()
+	gradient.offsets = PackedFloat32Array([0.0, 0.5, 1.0])
+	gradient.colors = PackedColorArray([Economy.color("bg_top"), Economy.color("bg"), Economy.color("bg_bottom")])
+	var texture: GradientTexture2D = GradientTexture2D.new()
+	texture.gradient = gradient
+	texture.fill_from = Vector2(0.0, 0.0)
+	texture.fill_to = Vector2(0.0, 1.0)
+	texture.width = 4
+	texture.height = BG_GRADIENT_HEIGHT
+	return texture
 
 
 func _connect_signals() -> void:

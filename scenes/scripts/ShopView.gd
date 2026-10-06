@@ -30,6 +30,7 @@ func _build_ads() -> void:
 			continue
 		var button: Button = Button.new()
 		button.text = "Смотреть рекламу: %s" % str(offer["title"])
+		button.theme_type_variation = &"ButtonPurple"
 		button.custom_minimum_size.y = Economy.ui_i("button_height")
 		button.pressed.connect(_on_rewarded.bind(str(offer["id"])))
 		_ads.add_child(button)
@@ -39,6 +40,7 @@ func _build_products() -> void:
 	for product: Variant in Economy.iap_products():
 		var sku: String = str(product["sku"])
 		var button: Button = Button.new()
+		button.theme_type_variation = &"ButtonGold"
 		button.custom_minimum_size.y = Economy.ui_i("button_height")
 		button.pressed.connect(func() -> void: Signals.modal_requested.emit("iap_confirm", {"sku": sku}))
 		_products.add_child(button)

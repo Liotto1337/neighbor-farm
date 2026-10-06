@@ -48,6 +48,7 @@ size_flags_horizontal = 3
 text = "Семена"
 
 [node name="SellAll" type="Button" parent="Margin/VBox/Actions"]
+theme_type_variation = &"ButtonGold"
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 size_flags_horizontal = 3

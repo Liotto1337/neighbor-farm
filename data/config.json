@@ -16,11 +16,10 @@
   "debug": { "fast_forward_seconds": 60, "grant_coins": 1000, "grant_xp": 100 },
   "ui": {
     "tile_size": 64,
-    "tile_gap": 2,
-    "tile_top_ratio": 0.75,
+    "tile_gap": 3,
     "tile_depth": 12,
     "tile_side": 8,
-    "field_top_margin": 40,
+    "field_top_margin": 16,
     "crop_min_fraction": 0.25,
     "crop_max_fraction": 0.8,
     "button_height": 64,
@@ -40,6 +39,9 @@
     "withered": "#77705a",
     "ready_text": "#fff27a",
     "letter": "#2b1d0e",
-    "leaf": "#4f9a3a"
+    "leaf": "#4f9a3a",
+    "dirt": "#6e4627",
+    "bg_top": "#5b8a3c",
+    "bg_bottom": "#26401c"
   }
 }

@@ -57,6 +57,7 @@ layout_mode = 2
 theme_override_constants/separation = 10
 
 [node name="Back" type="Button" parent="Margin/VisitPanel/Header"]
+theme_type_variation = &"ButtonBlue"
 custom_minimum_size = Vector2(140, 60)
 layout_mode = 2
 text = "< Назад"
@@ -78,6 +79,7 @@ layout_mode = 2
 text = "Доверие"
 
 [node name="TrustBar" type="ProgressBar" parent="Margin/VisitPanel"]
+theme_type_variation = &"TrustBar"
 custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 show_percentage = false
@@ -106,6 +108,7 @@ layout_mode = 2
 autowrap_mode = 3
 
 [node name="GiftButton" type="Button" parent="Margin/VisitPanel/Scroll/Actions"]
+theme_type_variation = &"ButtonPink"
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 text = "Забрать подарок"
@@ -115,11 +118,13 @@ layout_mode = 2
 autowrap_mode = 3
 
 [node name="OfferButton" type="Button" parent="Margin/VisitPanel/Scroll/Actions"]
+theme_type_variation = &"ButtonGold"
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 text = "Продать соседу"
 
 [node name="AdTrust" type="Button" parent="Margin/VisitPanel/Scroll/Actions"]
+theme_type_variation = &"ButtonPurple"
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 text = "Реклама: +доверие"
