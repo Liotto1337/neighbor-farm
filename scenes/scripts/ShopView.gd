@@ -5,6 +5,8 @@ extends Control
 const TAB_ID: String = "shop"
 const SHOP_PLACEMENT: String = "shop"
 const SECTION_FONT_SIZE: int = 26
+const CARD_TITLE_FONT_SIZE: int = 24
+const CARD_DESC_FONT_SIZE: int = 19
 const Fmt = preload("res://scenes/scripts/Fmt.gd")
 
 var _product_buttons: Dictionary = {}
@@ -45,11 +47,25 @@ func _build_ads() -> void:
 func _build_products() -> void:
 	for product: Variant in Economy.iap_products():
 		var sku: String = str(product["sku"])
+		var card: PanelContainer = PanelContainer.new()
+		card.theme_type_variation = &"Card"
+		var box: VBoxContainer = VBoxContainer.new()
+		var title: Label = Label.new()
+		title.text = str(product["title"])
+		title.add_theme_font_size_override("font_size", CARD_TITLE_FONT_SIZE)
+		var desc: Label = Label.new()
+		desc.text = str(product.get("desc", ""))
+		desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		desc.add_theme_font_size_override("font_size", CARD_DESC_FONT_SIZE)
 		var button: Button = Button.new()
 		button.theme_type_variation = &"ButtonGold"
 		button.custom_minimum_size.y = Economy.ui_i("button_height")
 		button.pressed.connect(func() -> void: Signals.modal_requested.emit("iap_confirm", {"sku": sku}))
-		_products.add_child(button)
+		box.add_child(title)
+		box.add_child(desc)
+		box.add_child(button)
+		card.add_child(box)
+		_products.add_child(card)
 		_product_buttons[sku] = button
 
 
@@ -108,7 +124,7 @@ func _refresh_products() -> void:
 		var sku: String = str(product["sku"])
 		var button: Button = _product_buttons[sku]
 		var owned: bool = not bool(product.get("consumable", true)) and IAP.is_owned(sku)
-		button.text = "%s — %s" % [str(product["title"]), "куплено" if owned else str(product["price"])]
+		button.text = "Куплено" if owned else "Купить за %s" % str(product["price"])
 		button.disabled = owned
 
 

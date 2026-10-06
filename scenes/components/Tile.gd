@@ -138,13 +138,12 @@ func appear(delay: float) -> void:
 	var seconds: float = Economy.anim_f("tile_appear_seconds")
 	_scale = Economy.anim_f("plant_pop_from")
 	modulate.a = 0.0
-	var tween: Tween = _tween("block").set_parallel()
-	tween.tween_property(self, "_scale", 1.0, seconds).set_delay(delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.tween_property(self, "modulate:a", 1.0, seconds * CENTER).set_delay(delay)
+	_tween("block").tween_property(self, "_scale", 1.0, seconds).set_delay(delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	# Own channel: a press or bounce restarting "block" must not leave the tile invisible.
+	_tween("fade").tween_property(self, "modulate:a", 1.0, seconds * CENTER).set_delay(delay)
 
 
 func _on_button_down() -> void:
-	modulate.a = 1.0
 	_tween("block").tween_property(self, "_scale", Economy.anim_f("press_scale"), Economy.anim_f("press_seconds")) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 

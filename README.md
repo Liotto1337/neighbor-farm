@@ -12,6 +12,6 @@ Web / Android (рендерер GL Compatibility). В пресете экспо�
 
 ## Структура
 - `autoload/` — Signals, GameState, SaveManager, TimeService, Economy, NeighborAI, IAP (заглушка), AdManager (заглушка), UiFx (анимации интерфейса), Audio (эмбиент, птицы, звуки; глушит звук при сворачивании и рекламе)
-- `data/` — весь баланс в JSON. Размер поля по уровням — `config.json` → `field_sizes` (4×4 на старте, 10×10 на 15 уровне), тайминги анимаций — `config.json` → `anim`
+- `data/` — весь баланс в JSON. Размер поля по уровням — `config.json` → `field_sizes` (4×4 на старте, 10×10 на 15 уровне), тайминги анимаций — `config.json` → `anim`. Кликер: `crops.json` → `taps` — сколько тапов по растущей грядке выращивают культуру с нуля; возврат за проданное животное — `config.json` → `animal_sell_refund`
 - `scenes/` — Main + 5 вкладок, компоненты (Tile, Modal, ContractRow, CurrencyChip; процедурная графика — TileArt, CropArt, IconArt)
 - `audio/` — звуки и эмбиент, сгенерированы `tools/make_audio.py` (`python3 tools/make_audio.py`; с модулями `numpy` + `soundfile` эмбиент пишется в OGG). Громкости — `config.json` → `audio`. Переключатели музыки и звуков — внизу вкладки «Магазин».

@@ -440,6 +440,20 @@ func _plant_tile(index: int, crop_id: String, now: float) -> void:
 	tiles[index] = {"s": TileState.PLANTED, "c": crop_id, "p": now, "g": grow}
 
 
+## Clicker: a tap on a growing crop moves its planting time back by grow_time / taps, so a
+## crop needs `taps` taps to ripen from seed. Returns the seconds cut (0 when not growing).
+func speed_up(index: int) -> float:
+	if not is_tile_open(index) or tile_state(index) != TileState.PLANTED:
+		return 0.0
+	var now: float = TimeService.now()
+	var t: Dictionary = tiles[index]
+	var cut: float = minf(float(t["g"]) / float(Economy.crop_taps(str(t["c"]))), tile_seconds_left(index, now))
+	t["p"] = float(t["p"]) - cut
+	t["s"] = _tile_state_at(t, now)
+	Signals.tiles_changed.emit()
+	return cut
+
+
 func harvest(index: int) -> bool:
 	if not is_tile_open(index) or tile_state(index) != TileState.READY or not _harvest_tile(index):
 		return false
@@ -578,6 +592,27 @@ func collect_animal(index: int) -> bool:
 	Signals.animals_changed.emit()
 	Signals.inventory_changed.emit()
 	_add_xp(int(def.get("xp", 0)))
+	return true
+
+
+## Coins returned when selling an animal (config animal_sell_refund x its price).
+func animal_sell_price(index: int) -> int:
+	if index < 0 or index >= animals.size():
+		return 0
+	var def: Dictionary = Economy.animal(str(animals[index]["t"]))
+	return roundi(float(def.get("cost", 0)) * Economy.cfg_f("animal_sell_refund"))
+
+
+func sell_animal(index: int) -> bool:
+	if index < 0 or index >= animals.size():
+		return false
+	var price: int = animal_sell_price(index)
+	var animal_name: String = str(Economy.animal(str(animals[index]["t"])).get("name", ""))
+	animals.remove_at(index)
+	coins += price
+	_emit_currencies()
+	Signals.animals_changed.emit()
+	_toast("Продано: %s, +%d монет" % [animal_name, price])
 	return true
 
 

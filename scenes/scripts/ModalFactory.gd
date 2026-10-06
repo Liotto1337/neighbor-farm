@@ -1,5 +1,6 @@
 extends RefCounted
-## Builds modal content by id: BuildMenu, PlantPicker, ContractDetails, IAPConfirm, WelcomeBack.
+## Builds modal content by id: BuildMenu, PlantPicker, ContractDetails, IAPConfirm, SellAnimal,
+## WelcomeBack.
 
 const ModalScript = preload("res://scenes/components/Modal.gd")
 const Fmt = preload("res://scenes/scripts/Fmt.gd")
@@ -15,6 +16,8 @@ func spec(modal_id: String, payload: Dictionary) -> Dictionary:
 			return {"title": "Контракт недели", "builder": _contract_details}
 		"iap_confirm":
 			return {"title": "Покупка", "builder": _iap_confirm.bind(payload)}
+		"sell_animal":
+			return {"title": "Продажа животного", "builder": _sell_animal.bind(payload)}
 		"welcome_back":
 			return {"title": "С возвращением!", "builder": _welcome_back.bind(payload)}
 	return {}
@@ -39,7 +42,7 @@ func _build_menu(m: ModalScript) -> void:
 
 
 func _plant_picker(m: ModalScript) -> void:
-	m.add_label("Семян: %d. Тап по вспаханной грядке сажает выбранную культуру." % GameState.seeds)
+	m.add_label("Семян: %d. Тап по вспаханной грядке сажает выбранную культуру, тапы по растущей — ускоряют рост." % GameState.seeds)
 	for def: Variant in Economy.crops_list():
 		var id: String = str(def["id"])
 		var unlock: int = int(def["unlock_level"])
@@ -95,6 +98,29 @@ func _iap_confirm(m: ModalScript, payload: Dictionary) -> void:
 func _confirm_purchase(sku: String) -> void:
 	Signals.modal_close_requested.emit()
 	IAP.purchase(sku)
+
+
+func _sell_animal(m: ModalScript, payload: Dictionary) -> void:
+	var index: int = int(payload.get("index", -1))
+	# The list may have changed since the modal opened: only sell the animal that was picked.
+	if index < 0 or index >= GameState.animals.size() or str(GameState.animals[index]["t"]) != str(payload.get("type", "")):
+		m.add_label("Это животное уже не в амбаре.")
+		m.add_button("Закрыть", m.close)
+		return
+	var def: Dictionary = Economy.animal(str(payload["type"]))
+	var price: int = GameState.animal_sell_price(index)
+	m.add_label("Продать «%s» за %d монет? Это %d%% от цены покупки (%d)." % [
+		str(def["name"]), price, roundi(Economy.cfg_f("animal_sell_refund") * 100.0), int(def["cost"])])
+	if GameState.animal_status(index, TimeService.now()) != GameState.AnimalStatus.HUNGRY:
+		m.add_label("Корм уже потрачен, а несобранный продукт (%s) пропадёт." % str(def["product_name"]).to_lower())
+	var sell: Button = m.add_button("Продать за %d монет" % price, _confirm_sell.bind(index))
+	sell.theme_type_variation = &"ButtonRed"
+	m.add_button("Оставить", m.close)
+
+
+func _confirm_sell(index: int) -> void:
+	Signals.modal_close_requested.emit()
+	GameState.sell_animal(index)
 
 
 func _welcome_back(m: ModalScript, summary: Dictionary) -> void:

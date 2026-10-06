@@ -127,6 +127,11 @@ func crop_grow_seconds(crop_id: String) -> float:
 	return float(crop(crop_id).get("grow_minutes", 0)) * cfg_f("tick_seconds")
 
 
+## Taps that grow this crop from seed to ripe (clicker); each tap cuts grow_time / taps.
+func crop_taps(crop_id: String) -> int:
+	return maxi(1, int(crop(crop_id).get("taps", 1)))
+
+
 func item_name(item_id: String) -> String:
 	if _crop_by_id.has(item_id):
 		return str(_crop_by_id[item_id]["name"])

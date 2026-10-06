@@ -13,6 +13,7 @@ import math
 import os
 import random
 import struct
+import zlib
 
 OUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "audio")
 SR = 44100
@@ -273,6 +274,21 @@ def sfx_clear(rng):
     return trim(out)
 
 
+def sfx_grow(rng):
+    """Clicker tap on a growing crop: a soft rising bubble (the game raises the pitch with progress)."""
+    out = tone(440, 700, 0.14, attack=0.004, decay=0.05, harmonics=((1, 1.0), (2, 0.25), (3, 0.06)))
+    mix(out, marimba(midi(81), 0.25, decay=0.05), 0.03, 0.25)
+    return trim(reverb(out, wet=0.15, room=0.5))
+
+
+def sfx_ripe(rng):
+    out = buf(1.0)
+    for k, note in enumerate((79, 84, 88)):
+        mix(out, bell(midi(note), 0.8, decay=0.25), k * 0.06, 0.5)
+    mix(out, shape(highpass(noise(0.3, rng), 6000), 0.05, 0.08), 0.1, 0.05)
+    return trim(reverb(out, wet=0.25, room=0.8))
+
+
 def sfx_tock(rng):
     out = marimba(midi(64), 0.3, decay=0.06)
     mix(out, marimba(midi(57), 0.3, decay=0.08), 0.0, 0.5)
@@ -435,10 +451,10 @@ def main():
     sfx = {
         "click": sfx_click, "tab": sfx_tab, "modal_open": sfx_modal_open, "modal_close": sfx_modal_close,
         "deny": sfx_deny, "plow": sfx_plow, "plant": sfx_plant, "harvest": sfx_harvest, "clear": sfx_clear,
-        "tock": sfx_tock, "coin": sfx_coin, "build": sfx_build, "level_up": sfx_level_up, "expand": sfx_expand,
+        "tock": sfx_tock, "grow": sfx_grow, "ripe": sfx_ripe, "coin": sfx_coin, "build": sfx_build, "level_up": sfx_level_up, "expand": sfx_expand,
     }
-    for seed, (name, fn) in enumerate(sorted(sfx.items())):
-        write_wav(name, fn(random.Random(seed + 1)), SR)
+    for name, fn in sorted(sfx.items()):
+        write_wav(name, fn(random.Random(zlib.crc32(name.encode()))), SR)
     for k, pattern in enumerate(BIRDS):
         write_wav("bird_%d" % (k + 1), bird(random.Random(100 + k), pattern), SR_AMB, peak=0.7)
     loop = ambient(random.Random(7))

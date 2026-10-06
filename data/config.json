@@ -18,6 +18,7 @@
   "offline_cap_seconds": 28800,
   "welcome_min_seconds": 60,
   "boost_growth_multiplier": 0.5,
+  "animal_sell_refund": 0.5,
   "feed_source_item": "corn",
   "feed_per_corn": 2,
   "seed_pack": { "seeds": 10, "cost": 15 },
@@ -80,7 +81,7 @@
     "bird_interval_seconds": [9, 26],
     "volumes_db": {
       "click": -9.0, "tab": -6.0, "modal_open": -7.0, "modal_close": -8.0, "deny": -10.0,
-      "plow": -5.0, "plant": -6.0, "harvest": -4.0, "clear": -6.0, "tock": -9.0,
+      "plow": -5.0, "plant": -6.0, "harvest": -4.0, "clear": -6.0, "tock": -9.0, "grow": -8.0, "ripe": -5.0,
       "coin": -8.0, "build": -5.0, "level_up": -3.0, "expand": -4.0
     }
   },

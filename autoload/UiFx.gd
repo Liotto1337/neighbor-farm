@@ -47,7 +47,7 @@ func _on_button_up(button: BaseButton) -> void:
 
 
 ## Text that rises from a point (global coordinates) and fades out, drawn above `host`'s children.
-func float_text(host: Control, text: String, global_pos: Vector2, color: Color = Color.WHITE) -> void:
+func float_text(host: Control, text: String, global_pos: Vector2, color: Color = Color.WHITE) -> Label:
 	var label: Label = Label.new()
 	label.text = text
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -69,6 +69,7 @@ func float_text(host: Control, text: String, global_pos: Vector2, color: Color =
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.tween_property(label, "modulate:a", 0.0, seconds * 0.5).set_delay(seconds * 0.5)
 	tween.chain().tween_callback(label.queue_free)
+	return label
 
 
 ## Brief bright tint that fades back to normal (counters, level label).

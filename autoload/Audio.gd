@@ -11,7 +11,7 @@ const SFX_BUS: StringName = &"Sfx"
 const SILENT_DB: float = -60.0
 const SFX_IDS: Array[String] = [
 	"click", "tab", "modal_open", "modal_close", "deny", "plow", "plant", "harvest", "clear",
-	"tock", "coin", "build", "level_up", "expand",
+	"tock", "grow", "ripe", "coin", "build", "level_up", "expand",
 ]
 const BIRD_COUNT: int = 3
 const BIRD_PITCH: Vector2 = Vector2(0.88, 1.15)

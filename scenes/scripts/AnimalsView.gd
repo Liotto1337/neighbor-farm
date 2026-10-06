@@ -1,8 +1,9 @@
 extends Control
-## Animals tab: barn status, buy animals, make feed from corn, feed and collect products.
+## Animals tab: barn status, buy and sell animals, make feed from corn, feed and collect products.
 
 const TAB_ID: String = "animals"
 const Fmt = preload("res://scenes/scripts/Fmt.gd")
+const SELL_BUTTON_WIDTH: int = 130
 
 var _rows: Array = []
 var _buy_buttons: Dictionary = {}
@@ -58,11 +59,11 @@ func _refresh() -> void:
 func _refresh_header() -> void:
 	var barn: int = GameState.building_level("barn")
 	if barn <= 0:
-		_header.text = "Постройте амбар: Ферма → Постройки."
+		_header.text = "Постройте амбар: вкладка «Ферма», кнопка «Постройки»."
 	else:
 		_header.text = "Амбар ур. %d · животных %d / %d" % [barn, GameState.animals.size(), GameState.max_animals()]
 	var source: String = str(Economy.cfg("feed_source_item"))
-	_feed_info.text = "Корм: %d · %s: %d (1 → %d корма)" % [
+	_feed_info.text = "Корм: %d · %s: %d (1 шт. = %d корма)" % [
 		GameState.feed, Economy.item_name(source), GameState.item_count(source), Economy.cfg_i("feed_per_corn")]
 	_make_feed.disabled = GameState.item_count(source) <= 0
 
@@ -100,8 +101,14 @@ func _rebuild_rows() -> void:
 		var button: Button = Button.new()
 		button.custom_minimum_size = Vector2(Economy.ui_i("row_button_width"), Economy.ui_i("button_height"))
 		button.pressed.connect(_on_row_pressed.bind(i))
+		var sell: Button = Button.new()
+		sell.text = "Продать"
+		sell.theme_type_variation = &"ButtonRed"
+		sell.custom_minimum_size = Vector2(SELL_BUTTON_WIDTH, Economy.ui_i("button_height"))
+		sell.pressed.connect(_on_sell_pressed.bind(i))
 		row.add_child(label)
 		row.add_child(button)
+		row.add_child(sell)
 		_list.add_child(row)
 		_rows.append({"label": label, "button": button})
 
@@ -123,6 +130,10 @@ func _update_row(i: int, now: float) -> void:
 		label.text = "%s — готово: %s!" % [str(def["name"]), str(def["product_name"])]
 		button.text = "Собрать"
 		button.disabled = false
+
+
+func _on_sell_pressed(i: int) -> void:
+	Signals.modal_requested.emit("sell_animal", {"index": i, "type": str(GameState.animals[i]["t"])})
 
 
 func _on_row_pressed(i: int) -> void:

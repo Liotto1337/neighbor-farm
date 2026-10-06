@@ -1,5 +1,5 @@
 extends Control
-## Farm tab: tile grid, tap = context action (plow / plant / harvest / clear).
+## Farm tab: tile grid, tap = context action (plow / plant / speed up growth / harvest / clear).
 ## The open part of the field grows with the player's level (config "field_sizes") up to
 ## grid_size x grid_size; locked tiles stay hidden and new ones pop in when the field expands.
 
@@ -8,7 +8,13 @@ const TILE_SCENE: PackedScene = preload("res://scenes/components/Tile.tscn")
 const TileScript = preload("res://scenes/components/Tile.gd")
 const Fmt = preload("res://scenes/scripts/Fmt.gd")
 
+## Pitch of the growth tap sound from a fresh sprout (x) to almost ripe (y).
+const GROW_PITCH: Vector2 = Vector2(0.85, 1.35)
+const GROW_TEXT_COLOR: Color = Color("#b8f28a")
+
 var _tiles: Array = []
+## Live "−time" float per tile: rapid taps add up into one label instead of a stack.
+var _tap_floats: Dictionary = {}
 var _side: int = 0
 
 @onready var _crop_button: Button = $VBox/ToolbarTop/CropButton
@@ -138,8 +144,7 @@ func _on_tile_tapped(index: int) -> void:
 		else:
 			_sound(GameState.plant(index, GameState.selected_crop), "plant")
 	elif state == GameState.TileState.PLANTED:
-		Audio.play("tock")
-		_toast_growing(index)
+		_speed_up(index)
 	elif state == GameState.TileState.READY:
 		var crop_id: String = str(GameState.tile(index)["c"])
 		if _sound(GameState.harvest(index), "harvest"):
@@ -182,10 +187,27 @@ func _float_yield(index: int, crop_id: String) -> void:
 	UiFx.float_text(self, text, tile.global_position + tile.size * Vector2(0.5, 0.2), color)
 
 
-func _toast_growing(index: int) -> void:
-	var crop_name: String = Economy.item_name(str(GameState.tile(index)["c"]))
-	var left: float = GameState.tile_seconds_left(index, TimeService.now())
-	Signals.toast_requested.emit("%s: созреет через %s" % [crop_name, Fmt.duration(left)])
+## Clicker tap on a growing crop: cuts its remaining time; the sound rises with progress.
+func _speed_up(index: int) -> void:
+	var cut: float = GameState.speed_up(index)
+	if cut <= 0.0:
+		return
+	var tile: TileScript = _tiles[index]
+	var at: Vector2 = tile.global_position + tile.size * Vector2(0.5, 0.1)
+	var total: float = cut
+	var old: Variant = _tap_floats.get(index)
+	if old is Dictionary and is_instance_valid(old["label"]):
+		total += float(old["total"])
+		(old["label"] as Label).queue_free()
+	_tap_floats.erase(index)
+	if GameState.tile_state(index) == GameState.TileState.READY:
+		Audio.play("ripe")
+		UiFx.float_text(self, "Готово!", at, Economy.color("ready_text"))
+		return
+	var progress: float = GameState.tile_progress(index, TimeService.now())
+	Audio.play("grow", lerpf(GROW_PITCH.x, GROW_PITCH.y, progress))
+	var label: Label = UiFx.float_text(self, "−%s" % Fmt.duration(total), at, GROW_TEXT_COLOR)
+	_tap_floats[index] = {"label": label, "total": total}
 
 
 func _open_modal(modal_id: String) -> void:
