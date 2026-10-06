@@ -168,6 +168,8 @@ func _connect_signals() -> void:
 	Signals.ad_rewarded_completed.connect(_set_muted.bind("ad", false))
 	Signals.ad_interstitial_closed.connect(_set_muted.bind("ad", false))
 	Signals.ad_failed.connect(_set_muted.bind("ad", false).unbind(2))
+	# Platform pause: ads, purchase window, hidden tab (game_api_pause / game_api_resume).
+	YandexSdk.platform_paused.connect(func(paused: bool) -> void: _set_muted("platform", paused))
 
 
 # =====================================================================

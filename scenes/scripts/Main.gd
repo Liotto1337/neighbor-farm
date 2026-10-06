@@ -7,6 +7,12 @@ const ModalFactory = preload("res://scenes/scripts/ModalFactory.gd")
 const CurrencyChip = preload("res://scenes/components/CurrencyChip.gd")
 const TABS: Array[String] = ["farm", "animals", "market", "neighbors", "shop"]
 const NEIGHBORS_TAB_TITLE: String = "Соседи"
+const AD_FAIL_TEXT: Dictionary = {
+	"busy": "Реклама уже показывается",
+	"unavailable": "Реклама сейчас недоступна, попробуйте позже",
+	"closed_early": "Досмотрите рекламу до конца, чтобы получить награду",
+	"error": "Не удалось показать рекламу, попробуйте позже",
+}
 const BG_GRADIENT_HEIGHT: int = 256
 
 var _factory: ModalFactory = ModalFactory.new()
@@ -39,7 +45,12 @@ func _ready() -> void:
 	_toast.resized.connect(func() -> void: _toast.pivot_offset = _toast.size * 0.5)
 	_connect_signals()
 	_setup_tabs()
-	var had_save: bool = SaveManager.load_or_create()
+	SaveManager.loaded.connect(_on_save_loaded, CONNECT_ONE_SHOT)
+	SaveManager.boot()
+
+
+## The save (local or newer cloud copy) is in GameState: start the clock and show the farm.
+func _on_save_loaded(had_save: bool) -> void:
 	TimeService.start(had_save)
 	Signals.tab_requested.emit(TABS[0])
 
@@ -66,7 +77,6 @@ func _connect_signals() -> void:
 	Signals.modal_close_requested.connect(_on_modal_close)
 	Signals.toast_requested.connect(_show_toast)
 	Signals.welcome_back.connect(_on_welcome_back)
-	Signals.ad_started.connect(_on_ad_started)
 	Signals.ad_rewarded_completed.connect(_show_toast.bind("Награда получена!"))
 	Signals.ad_failed.connect(_on_ad_failed)
 	Signals.tab_requested.connect(_on_tab_shown)
@@ -209,12 +219,8 @@ func _on_welcome_back(summary: Dictionary) -> void:
 	Signals.modal_requested.emit("welcome_back", summary)
 
 
-func _on_ad_started(kind: String) -> void:
-	_show_toast("Реклама (заглушка): %s" % kind)
-
-
-func _on_ad_failed(kind: String, reason: String) -> void:
-	_show_toast("Реклама недоступна (%s): %s" % [kind, reason])
+func _on_ad_failed(_kind: String, reason: String) -> void:
+	_show_toast(str(AD_FAIL_TEXT.get(reason, AD_FAIL_TEXT["error"])))
 
 
 func _show_toast(text: String) -> void:

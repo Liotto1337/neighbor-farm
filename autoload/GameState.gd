@@ -6,6 +6,7 @@ enum TileState { EMPTY, PLOWED, PLANTED, READY, WITHERED }
 enum AnimalStatus { HUNGRY, PRODUCING, READY }
 
 const SECONDS_PER_HOUR: float = 3600.0
+const PURCHASE_TOKENS_KEPT: int = 100
 
 var world_seed: int = 0
 var coins: int = 0
@@ -20,6 +21,9 @@ var animals: Array = []
 var neighbors: Array = []
 var contract: Dictionary = {}
 var owned_skus: Array = []
+## Platform purchase tokens already granted (newest last), so a purchase whose consume failed
+## is not granted twice when it is recovered at the next launch.
+var purchase_tokens: Array = []
 var no_ads: bool = false
 var selected_crop: String = ""
 var boost_until: float = 0.0
@@ -49,6 +53,7 @@ func new_game(seed_value: int) -> void:
 	buildings = _make_buildings({})
 	animals = []
 	owned_skus = []
+	purchase_tokens = []
 	no_ads = false
 	boost_until = 0.0
 	contract = {}
@@ -66,6 +71,7 @@ func to_dict() -> Dictionary:
 		"tiles": tiles.duplicate(true), "buildings": buildings.duplicate(),
 		"animals": animals.duplicate(true), "neighbors": neighbors.duplicate(true),
 		"contract": contract.duplicate(), "owned_skus": owned_skus.duplicate(),
+		"purchase_tokens": purchase_tokens.duplicate(),
 		"no_ads": no_ads, "selected_crop": selected_crop, "boost_until": boost_until,
 		"time_offset": time_offset, "last_save": last_save,
 		"last_decay_at": last_decay_at, "last_stall_at": last_stall_at,
@@ -85,6 +91,11 @@ func from_dict(d: Dictionary) -> void:
 	if raw_skus is Array:
 		for sku: Variant in raw_skus:
 			owned_skus.append(str(sku))
+	purchase_tokens = []
+	var raw_tokens: Variant = d.get("purchase_tokens", [])
+	if raw_tokens is Array:
+		for token: Variant in raw_tokens:
+			purchase_tokens.append(str(token))
 
 
 func _load_scalars(d: Dictionary) -> void:
@@ -1002,11 +1013,19 @@ func is_sku_owned(sku: String) -> bool:
 	return owned_skus.has(sku)
 
 
-func apply_purchase(sku: String) -> void:
+func has_purchase_token(token: String) -> bool:
+	return purchase_tokens.has(token)
+
+
+func apply_purchase(sku: String, token: String = "") -> void:
 	var product: Dictionary = Economy.iap_product(sku)
 	if product.is_empty():
 		push_error("GameState: unknown sku '%s'" % sku)
 		return
+	if not token.is_empty():
+		purchase_tokens.append(token)
+		if purchase_tokens.size() > PURCHASE_TOKENS_KEPT:
+			purchase_tokens = purchase_tokens.slice(purchase_tokens.size() - PURCHASE_TOKENS_KEPT)
 	if not bool(product.get("consumable", true)) and not owned_skus.has(sku):
 		owned_skus.append(sku)
 	_apply_grant(product.get("grant", {}), -1)

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "coins_small",
+    "title": "Горсть монет",
+    "description": "500 монет сразу на счёт. Хватит на корову или пару улучшений построек.",
+    "imageURI": "",
+    "price": "29 YAN",
+    "priceCurrencyCode": "YAN",
+    "priceValue": "29",
+    "getPriceCurrencyImage": ""
+  },
+  {
+    "id": "coins_big",
+    "title": "Сундук монет",
+    "description": "3000 монет сразу на счёт. Самый выгодный набор: монет в 6 раз больше, чем в «Горсти».",
+    "imageURI": "",
+    "price": "129 YAN",
+    "priceCurrencyCode": "YAN",
+    "priceValue": "129",
+    "getPriceCurrencyImage": ""
+  },
+  {
+    "id": "speedup_2h",
+    "title": "Ускорение 2 ч",
+    "description": "Время на ферме мгновенно идёт вперёд на 2 часа: растения растут, животные дают продукцию, прилавок торгует.",
+    "imageURI": "",
+    "price": "49 YAN",
+    "priceCurrencyCode": "YAN",
+    "priceValue": "49",
+    "getPriceCurrencyImage": ""
+  },
+  {
+    "id": "no_ads",
+    "title": "Без рекламы",
+    "description": "Навсегда отключает рекламу при повышении уровня. Реклама за награды остаётся по желанию.",
+    "imageURI": "",
+    "price": "199 YAN",
+    "priceCurrencyCode": "YAN",
+    "priceValue": "199",
+    "getPriceCurrencyImage": ""
+  },
+  {
+    "id": "starter_pack",
+    "title": "Набор новичка",
+    "description": "1000 монет, 100 семян и 50 корма для быстрого старта. Можно купить только один раз.",
+    "imageURI": "",
+    "price": "99 YAN",
+    "priceCurrencyCode": "YAN",
+    "priceValue": "99",
+    "getPriceCurrencyImage": ""
+  }
+]

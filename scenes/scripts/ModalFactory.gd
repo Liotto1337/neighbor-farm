@@ -1,5 +1,5 @@
 extends RefCounted
-## Builds modal content by id: BuildMenu, PlantPicker, ContractDetails, IAPConfirm, SellAnimal,
+## Builds modal content by id: BuildMenu, PlantPicker, ContractDetails, SellAnimal,
 ## WelcomeBack.
 
 const ModalScript = preload("res://scenes/components/Modal.gd")
@@ -14,8 +14,6 @@ func spec(modal_id: String, payload: Dictionary) -> Dictionary:
 			return {"title": "Что сажаем?", "builder": _plant_picker}
 		"contract_details":
 			return {"title": "Контракт недели", "builder": _contract_details}
-		"iap_confirm":
-			return {"title": "Покупка", "builder": _iap_confirm.bind(payload)}
 		"sell_animal":
 			return {"title": "Продажа животного", "builder": _sell_animal.bind(payload)}
 		"welcome_back":
@@ -78,26 +76,6 @@ func _contract_details(m: ModalScript) -> void:
 	var can_claim: bool = progress >= target and not GameState.contract_claimed()
 	var claim_text: String = "Награда получена" if GameState.contract_claimed() else "Открыть сундук"
 	m.add_button(claim_text, GameState.claim_contract, can_claim)
-
-
-func _iap_confirm(m: ModalScript, payload: Dictionary) -> void:
-	var sku: String = str(payload.get("sku", ""))
-	var product: Dictionary = Economy.iap_product(sku)
-	if product.is_empty():
-		m.add_label("Товар не найден.")
-		return
-	m.add_label("%s\n%s" % [str(product["title"]), str(product["desc"])])
-	m.add_label("Цена: %s" % str(product["price"]))
-	if not bool(product.get("consumable", true)) and IAP.is_owned(sku):
-		m.add_label("Уже куплено.")
-	else:
-		m.add_button("Купить за %s" % str(product["price"]), _confirm_purchase.bind(sku))
-	m.add_button("Отмена", m.close)
-
-
-func _confirm_purchase(sku: String) -> void:
-	Signals.modal_close_requested.emit()
-	IAP.purchase(sku)
 
 
 func _sell_animal(m: ModalScript, payload: Dictionary) -> void:

@@ -13,6 +13,8 @@
   "tick_seconds": 60,
   "ui_refresh_seconds": 1.0,
   "autosave_seconds": 15.0,
+  "cloud_save_seconds": 30.0,
+  "cloud_boot_timeout_seconds": 5.0,
   "storage_base": 200,
   "wither_multiplier": 3.0,
   "offline_cap_seconds": 28800,
