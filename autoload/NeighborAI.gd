@@ -21,13 +21,48 @@ func profiles(world_seed: int) -> Array:
 
 func _make_profile(world_seed: int, index: int, display_name: String) -> Dictionary:
 	var rng: RandomNumberGenerator = _rng([world_seed, index, "profile"])
-	var palette: Array = Economy.neighbor_cfg("farm_palette")
-	var side: int = int(Economy.neighbor_cfg("visit_grid"))
-	var cells: Array = []
-	for c: int in side * side:
-		cells.append(str(palette[rng.randi_range(0, palette.size() - 1)]))
 	var rate: Vector2 = Economy.neighbor_range("contract_rate_per_hour")
-	return {"name": display_name, "cells": cells, "rate": rng.randf_range(rate.x, rate.y)}
+	var contract_rate: float = rng.randf_range(rate.x, rate.y)
+	return {"name": display_name, "tiles": _make_farm(rng), "rate": contract_rate}
+
+
+## Snapshot of a neighbor's field for the visit screen: a few favourite crops planted row by
+## row at similar growth, with some ripe, bare, plowed or withered beds. Tiles use GameState's
+## tile format plus "progress" (0..1) for growing crops.
+func _make_farm(rng: RandomNumberGenerator) -> Array:
+	var cfg: Dictionary = Economy.neighbor_cfg("visit_farm")
+	var crop_ids: Array = []
+	for def: Variant in Economy.crops_list():
+		crop_ids.append(str(def["id"]))
+	_shuffle(crop_ids, rng)
+	var counts: Array = cfg.get("crops_per_farm", [2, 3])
+	var favorites: Array = crop_ids.slice(0, clampi(rng.randi_range(int(counts[0]), int(counts[1])), 1, crop_ids.size()))
+	var empty: float = float(cfg.get("empty", 0.0))
+	var plowed: float = empty + float(cfg.get("plowed", 0.0))
+	var withered: float = plowed + float(cfg.get("withered", 0.0))
+	var ready: float = withered + float(cfg.get("ready", 0.0))
+	var spread: float = float(cfg.get("row_progress_spread", 0.0))
+	var side: int = int(Economy.neighbor_cfg("visit_grid"))
+	var tiles: Array = []
+	for row: int in side:
+		var crop_id: String = str(favorites[rng.randi_range(0, favorites.size() - 1)])
+		var row_progress: float = rng.randf()
+		for col: int in side:
+			var roll: float = rng.randf()
+			var tile: Dictionary = {"s": GameState.TileState.PLANTED, "c": crop_id, "progress": 0.0}
+			if roll < empty:
+				tile = {"s": GameState.TileState.EMPTY, "c": "", "progress": 0.0}
+			elif roll < plowed:
+				tile = {"s": GameState.TileState.PLOWED, "c": "", "progress": 0.0}
+			elif roll < withered:
+				tile["s"] = GameState.TileState.WITHERED
+			elif roll < ready:
+				tile["s"] = GameState.TileState.READY
+				tile["progress"] = 1.0
+			else:
+				tile["progress"] = clampf(row_progress + rng.randf_range(-spread, spread), 0.0, 0.99)
+			tiles.append(tile)
+	return tiles
 
 
 func make_states(world_seed: int, now: float) -> Array:

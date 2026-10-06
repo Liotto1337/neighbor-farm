@@ -4,6 +4,7 @@ extends Control
 const MODAL_SCENE: PackedScene = preload("res://scenes/components/Modal.tscn")
 const ModalScript = preload("res://scenes/components/Modal.gd")
 const ModalFactory = preload("res://scenes/scripts/ModalFactory.gd")
+const CurrencyChip = preload("res://scenes/components/CurrencyChip.gd")
 const TABS: Array[String] = ["farm", "animals", "market", "neighbors", "shop"]
 const NEIGHBORS_TAB_TITLE: String = "Соседи"
 const BG_GRADIENT_HEIGHT: int = 256
@@ -20,10 +21,10 @@ var _shown: Dictionary = {}
 var _counter_tweens: Dictionary = {}
 
 @onready var _bg: TextureRect = $Bg
-@onready var _coins: Label = $Root/TopBar/HBox/Coins
-@onready var _seeds: Label = $Root/TopBar/HBox/Seeds
-@onready var _feed: Label = $Root/TopBar/HBox/Feed
-@onready var _level: Label = $Root/TopBar/HBox/LevelBox/Level
+@onready var _coins: CurrencyChip = $Root/TopBar/HBox/Coins
+@onready var _seeds: CurrencyChip = $Root/TopBar/HBox/Seeds
+@onready var _feed: CurrencyChip = $Root/TopBar/HBox/Feed
+@onready var _level: CurrencyChip = $Root/TopBar/HBox/LevelBox/Level
 @onready var _xp_bar: ProgressBar = $Root/TopBar/HBox/LevelBox/XpBar
 @onready var _tab_bar: HBoxContainer = $Root/TabBar
 @onready var _neighbors_tab: Button = $Root/TabBar/NeighborsTab
@@ -143,21 +144,21 @@ func _set_counter(shown: float, key: String) -> void:
 	_shown[key] = value
 	var cap: int = GameState.storage_cap()
 	if key == "coins":
-		_coins.text = "Монеты\n%d" % value
+		_coins.show_value("Монеты", str(value))
 	elif key == "seeds":
-		_seeds.text = "Семена\n%d/%d" % [value, cap]
+		_seeds.show_value("Семена", "%d/%d" % [value, cap])
 	else:
-		_feed.text = "Корм\n%d/%d" % [value, cap]
+		_feed.show_value("Корм", "%d/%d" % [value, cap])
 
 
-func _counter_label(key: String) -> Label:
+func _counter_label(key: String) -> CurrencyChip:
 	if key == "coins":
 		return _coins
 	return _seeds if key == "seeds" else _feed
 
 
 func _on_xp(level: int, xp_in_level: int, xp_needed: int) -> void:
-	_level.text = "Уровень %d" % level
+	_level.show_value("", "Уровень %d" % level)
 	var target_max: float = maxf(float(xp_needed), 1.0)
 	var target: float = target_max if xp_needed <= 0 else float(xp_in_level)
 	if _xp_tween != null and _xp_tween.is_valid():

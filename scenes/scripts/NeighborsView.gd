@@ -4,6 +4,8 @@ extends Control
 const TAB_ID: String = "neighbors"
 const REWARDED_TRUST_ID: String = "trust"
 const Fmt = preload("res://scenes/scripts/Fmt.gd")
+const TILE_SCENE: PackedScene = preload("res://scenes/components/Tile.tscn")
+const TileScript = preload("res://scenes/components/Tile.gd")
 
 var _rows: Array = []
 var _visit_index: int = -1
@@ -13,7 +15,8 @@ var _visit_index: int = -1
 @onready var _visit_panel: VBoxContainer = $Margin/VisitPanel
 @onready var _back: Button = $Margin/VisitPanel/Header/Back
 @onready var _visit_name: Label = $Margin/VisitPanel/Header/Name
-@onready var _farm_grid: GridContainer = $Margin/VisitPanel/Farm/Grid
+@onready var _farm_field: MarginContainer = $Margin/VisitPanel/Farm/Field
+@onready var _farm_grid: GridContainer = $Margin/VisitPanel/Farm/Field/Plate/Grid
 @onready var _trust: Label = $Margin/VisitPanel/Trust
 @onready var _trust_bar: ProgressBar = $Margin/VisitPanel/TrustBar
 @onready var _request: Label = $Margin/VisitPanel/Scroll/Actions/Request
@@ -135,17 +138,22 @@ func _build_farm_grid(index: int) -> void:
 		_farm_grid.remove_child(child)
 		child.queue_free()
 	var profile: Dictionary = NeighborAI.profiles(GameState.world_seed)[index]
-	var side: int = int(Economy.neighbor_cfg("visit_grid"))
-	var cell: int = Economy.ui_i("visit_cell")
-	_farm_grid.columns = side
+	var tiles: Array = profile["tiles"]
+	_farm_grid.columns = int(Economy.neighbor_cfg("visit_grid"))
 	_farm_grid.add_theme_constant_override("h_separation", Economy.ui_i("visit_gap"))
 	_farm_grid.add_theme_constant_override("v_separation", Economy.ui_i("visit_gap"))
+	# Headroom so tall plants in the first row do not cover the header.
+	_farm_field.add_theme_constant_override("margin_top", Economy.ui_i("field_top_margin"))
 	_visit_name.text = str(profile["name"])
-	for color_hex: Variant in profile["cells"]:
-		var rect: ColorRect = ColorRect.new()
-		rect.custom_minimum_size = Vector2(cell, cell)
-		rect.color = Color.from_string(str(color_hex), Color.WHITE)
-		_farm_grid.add_child(rect)
+	for i: int in tiles.size():
+		var t: Dictionary = tiles[i]
+		var tile: TileScript = TILE_SCENE.instantiate()
+		# Look-only: the neighbor's beds cannot be tapped.
+		tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		tile.show_progress = false
+		_farm_grid.add_child(tile)
+		tile.setup(i, Economy.ui_i("visit_cell"))
+		tile.render(t, float(t.get("progress", 0.0)))
 
 
 func _refresh_visit(now: float) -> void:

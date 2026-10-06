@@ -44,6 +44,8 @@ const BAR_HEIGHT: float = 7.0
 const BAR_INSET: float = 3.0
 
 var index: int = -1
+## Growth bar under planted crops (off for the look-only neighbor field).
+var show_progress: bool = true
 var _size_px: float = 0.0
 var _depth_px: float = 0.0
 var _side_px: float = 0.0
@@ -126,7 +128,7 @@ func render(t: Dictionary, progress: float) -> void:
 		elif old_plant != null:
 			_lift_plant(old_plant)
 	set_process(_state == GameState.TileState.READY)
-	_bar.visible = _state == GameState.TileState.PLANTED
+	_bar.visible = show_progress and _state == GameState.TileState.PLANTED
 	_bar.value = progress
 	queue_redraw()
 

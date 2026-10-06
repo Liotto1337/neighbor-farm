@@ -71,7 +71,14 @@ text = "Сосед"
 [node name="Farm" type="CenterContainer" parent="Margin/VisitPanel"]
 layout_mode = 2
 
-[node name="Grid" type="GridContainer" parent="Margin/VisitPanel/Farm"]
+[node name="Field" type="MarginContainer" parent="Margin/VisitPanel/Farm"]
+layout_mode = 2
+
+[node name="Plate" type="PanelContainer" parent="Margin/VisitPanel/Farm/Field"]
+layout_mode = 2
+theme_type_variation = &"FieldPlate"
+
+[node name="Grid" type="GridContainer" parent="Margin/VisitPanel/Farm/Field/Plate"]
 layout_mode = 2
 
 [node name="Trust" type="Label" parent="Margin/VisitPanel"]

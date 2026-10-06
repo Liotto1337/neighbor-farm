@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scenes/scripts/Main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://scenes/FarmView.tscn" id="2_farm"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/MarketView.tscn" id="4_market"]
 [ext_resource type="PackedScene" path="res://scenes/NeighborsView.tscn" id="5_neighbors"]
 [ext_resource type="PackedScene" path="res://scenes/ShopView.tscn" id="6_shop"]
+[ext_resource type="Script" path="res://scenes/components/CurrencyChip.gd" id="7_chip"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_toast"]
 content_margin_left = 16.0
@@ -60,32 +61,44 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Coins" type="Label" parent="Root/TopBar/HBox"]
+[node name="Coins" type="RichTextLabel" parent="Root/TopBar/HBox"]
+texture_filter = 5
 theme_type_variation = &"ChipCoins"
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
-text = "Монеты
-0"
-horizontal_alignment = 1
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 20
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+script = ExtResource("7_chip")
+icon_id = "coins"
 
-[node name="Seeds" type="Label" parent="Root/TopBar/HBox"]
+[node name="Seeds" type="RichTextLabel" parent="Root/TopBar/HBox"]
+texture_filter = 5
 theme_type_variation = &"ChipSeeds"
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
-text = "Семена
-0"
-horizontal_alignment = 1
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 20
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+script = ExtResource("7_chip")
+icon_id = "seeds"
 
-[node name="Feed" type="Label" parent="Root/TopBar/HBox"]
+[node name="Feed" type="RichTextLabel" parent="Root/TopBar/HBox"]
+texture_filter = 5
 theme_type_variation = &"ChipFeed"
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
-text = "Корм
-0"
-horizontal_alignment = 1
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 20
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+script = ExtResource("7_chip")
+icon_id = "feed"
 
 [node name="LevelBox" type="VBoxContainer" parent="Root/TopBar/HBox"]
 layout_mode = 2
@@ -93,12 +106,18 @@ size_flags_horizontal = 3
 size_flags_stretch_ratio = 1.4
 alignment = 1
 
-[node name="Level" type="Label" parent="Root/TopBar/HBox/LevelBox"]
+[node name="Level" type="RichTextLabel" parent="Root/TopBar/HBox/LevelBox"]
+texture_filter = 5
 theme_type_variation = &"ChipLevel"
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Уровень 1"
-horizontal_alignment = 1
+mouse_filter = 2
+theme_override_font_sizes/normal_font_size = 20
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+script = ExtResource("7_chip")
+icon_id = "level"
+icon_scale = 1.15
 
 [node name="XpBar" type="ProgressBar" parent="Root/TopBar/HBox/LevelBox"]
 theme_type_variation = &"XpBar"
