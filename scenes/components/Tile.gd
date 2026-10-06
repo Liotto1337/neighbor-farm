@@ -1,10 +1,11 @@
 extends Button
 ## One farm tile. Pure view: renders a tile dictionary, reports taps via Signals.
-## Drawn as a "top-down at an angle" block: squashed top face + visible front side,
-## with upright plants that may overlap the row above (later rows draw on top).
+## Drawn as a "top-down at an angle" block tilted on both axes: squashed top face,
+## a front side and a left/right side (per ui.tile_side sign), with upright plants that may overlap the row above (later rows draw on top).
 
 const CENTER: float = 0.5
 const SIDE_SHADE: float = 0.35
+const FLANK_SHADE: float = 0.5
 const EDGE_LIGHT: float = 0.18
 const EDGE_WIDTH: float = 2.0
 const FURROWS: int = 3
@@ -29,6 +30,8 @@ var index: int = -1
 var _size_px: float = 0.0
 var _top_px: float = 0.0
 var _depth_px: float = 0.0
+var _side_px: float = 0.0
+var _left_px: float = 0.0
 var _state: int = GameState.TileState.EMPTY
 var _progress: float = 0.0
 var _crop_color: Color = Color.WHITE
@@ -44,10 +47,14 @@ func _ready() -> void:
 
 func setup(tile_index: int, size_px: int) -> void:
 	index = tile_index
-	_size_px = float(size_px)
+	_side_px = float(Economy.ui_i("tile_side"))
+	_size_px = float(size_px) - absf(_side_px)
+	_left_px = maxf(-_side_px, 0.0)
 	_top_px = roundf(_size_px * Economy.ui_f("tile_top_ratio"))
 	_depth_px = float(Economy.ui_i("tile_depth"))
-	custom_minimum_size = Vector2(_size_px, _top_px + _depth_px)
+	custom_minimum_size = Vector2(float(size_px), _top_px + _depth_px)
+	_bar.offset_left = _left_px + BAR_INSET
+	_bar.offset_right = -(maxf(_side_px, 0.0) + BAR_INSET)
 	_bar.offset_top = -(_depth_px + BAR_INSET + BAR_HEIGHT)
 	_bar.offset_bottom = -(_depth_px + BAR_INSET)
 	_tufts = _make_tufts(tile_index)
@@ -76,9 +83,18 @@ func _draw() -> void:
 
 func _draw_block() -> void:
 	var top_color: Color = _soil_color(_state)
-	draw_rect(Rect2(0.0, _top_px, _size_px, _depth_px), top_color.darkened(SIDE_SHADE))
-	draw_rect(Rect2(0.0, 0.0, _size_px, _top_px), top_color)
-	draw_line(Vector2(0.0, 1.0), Vector2(_size_px, 1.0), top_color.lightened(EDGE_LIGHT), EDGE_WIDTH)
+	var shift: Vector2 = Vector2(_side_px, _depth_px)
+	var tl: Vector2 = Vector2(_left_px, 0.0)
+	var tr: Vector2 = Vector2(_left_px + _size_px, 0.0)
+	var bl: Vector2 = Vector2(_left_px, _top_px)
+	var br: Vector2 = Vector2(_left_px + _size_px, _top_px)
+	draw_colored_polygon(PackedVector2Array([bl, br, br + shift, bl + shift]), top_color.darkened(SIDE_SHADE))
+	if _side_px > 0.0:
+		draw_colored_polygon(PackedVector2Array([tr, tr + shift, br + shift, br]), top_color.darkened(FLANK_SHADE))
+	elif _side_px < 0.0:
+		draw_colored_polygon(PackedVector2Array([tl, tl + shift, bl + shift, bl]), top_color.darkened(FLANK_SHADE))
+	draw_rect(Rect2(tl, Vector2(_size_px, _top_px)), top_color)
+	draw_line(tl + Vector2(0.0, 1.0), tr + Vector2(0.0, 1.0), top_color.lightened(EDGE_LIGHT), EDGE_WIDTH)
 
 
 func _draw_tufts() -> void:
@@ -93,8 +109,10 @@ func _draw_furrows() -> void:
 	var step: float = _top_px / float(FURROWS + 1)
 	for i: int in FURROWS:
 		var y: float = step * float(i + 1)
-		draw_line(Vector2(EDGE_WIDTH, y), Vector2(_size_px - EDGE_WIDTH, y), base.darkened(SIDE_SHADE), FURROW_WIDTH)
-		draw_line(Vector2(EDGE_WIDTH, y + FURROW_WIDTH), Vector2(_size_px - EDGE_WIDTH, y + FURROW_WIDTH), base.lightened(EDGE_LIGHT), 1.0)
+		var x0: float = _left_px + EDGE_WIDTH
+		var x1: float = _left_px + _size_px - EDGE_WIDTH
+		draw_line(Vector2(x0, y), Vector2(x1, y), base.darkened(SIDE_SHADE), FURROW_WIDTH)
+		draw_line(Vector2(x0, y + FURROW_WIDTH), Vector2(x1, y + FURROW_WIDTH), base.lightened(EDGE_LIGHT), 1.0)
 
 
 func _draw_plant() -> void:
@@ -102,7 +120,7 @@ func _draw_plant() -> void:
 	var min_f: float = Economy.ui_f("crop_min_fraction")
 	var max_f: float = Economy.ui_f("crop_max_fraction")
 	var height: float = _size_px * lerpf(min_f, max_f, _progress)
-	var base: Vector2 = Vector2(_size_px * CENTER, _top_px * PLANT_BASE_Y)
+	var base: Vector2 = Vector2(_left_px + _size_px * CENTER, _top_px * PLANT_BASE_Y)
 	var top: Vector2 = base + Vector2(0.0, -height)
 	var leaf_color: Color = Economy.color("withered") if withered else Economy.color("leaf")
 
@@ -142,7 +160,7 @@ func _make_tufts(seed_value: int) -> PackedVector2Array:
 	rng.seed = seed_value
 	var out: PackedVector2Array = PackedVector2Array()
 	for i: int in TUFTS:
-		out.append(Vector2(rng.randf_range(TUFT_SIZE, _size_px - TUFT_SIZE), rng.randf_range(TUFT_SIZE * 2.0, _top_px - TUFT_SIZE)))
+		out.append(Vector2(_left_px + rng.randf_range(TUFT_SIZE, _size_px - TUFT_SIZE), rng.randf_range(TUFT_SIZE * 2.0, _top_px - TUFT_SIZE)))
 	return out
 
 

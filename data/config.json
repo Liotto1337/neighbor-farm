@@ -19,6 +19,7 @@
     "tile_gap": 2,
     "tile_top_ratio": 0.75,
     "tile_depth": 12,
+    "tile_side": 8,
     "field_top_margin": 40,
     "crop_min_fraction": 0.25,
     "crop_max_fraction": 0.8,
