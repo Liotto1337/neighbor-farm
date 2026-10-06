@@ -11,6 +11,13 @@ const BG_GRADIENT_HEIGHT: int = 256
 var _factory: ModalFactory = ModalFactory.new()
 var _modal_stack: Array = []
 var _toast_tween: Tween = null
+var _tab_tween: Tween = null
+var _xp_tween: Tween = null
+var _tab_index: int = 0
+var _shown_level: int = 0
+## Counter values currently displayed in the top bar (they roll towards the real ones).
+var _shown: Dictionary = {}
+var _counter_tweens: Dictionary = {}
 
 @onready var _bg: TextureRect = $Bg
 @onready var _coins: Label = $Root/TopBar/HBox/Coins
@@ -20,6 +27,7 @@ var _toast_tween: Tween = null
 @onready var _xp_bar: ProgressBar = $Root/TopBar/HBox/LevelBox/XpBar
 @onready var _tab_bar: HBoxContainer = $Root/TabBar
 @onready var _neighbors_tab: Button = $Root/TabBar/NeighborsTab
+@onready var _content: Control = $Root/Content
 @onready var _modal_layer: Control = $ModalLayer
 @onready var _toast: Label = $Toast
 
@@ -27,6 +35,7 @@ var _toast_tween: Tween = null
 func _ready() -> void:
 	_bg.texture = _make_bg_gradient()
 	_toast.modulate.a = 0.0
+	_toast.resized.connect(func() -> void: _toast.pivot_offset = _toast.size * 0.5)
 	_connect_signals()
 	_setup_tabs()
 	var had_save: bool = SaveManager.load_or_create()
@@ -59,6 +68,7 @@ func _connect_signals() -> void:
 	Signals.ad_started.connect(_on_ad_started)
 	Signals.ad_rewarded_completed.connect(_show_toast.bind("Награда получена!"))
 	Signals.ad_failed.connect(_on_ad_failed)
+	Signals.tab_requested.connect(_on_tab_shown)
 
 
 func _setup_tabs() -> void:
@@ -76,17 +86,96 @@ func _on_tab_pressed(tab_id: String) -> void:
 	Signals.tab_requested.emit(tab_id)
 
 
+## Slides the newly shown view in from the side of the tab it came from. Connected after the
+## views, so the target view is already visible here.
+func _on_tab_shown(tab_id: String) -> void:
+	var index: int = TABS.find(tab_id)
+	var direction: float = signf(float(index - _tab_index))
+	_tab_index = index
+	if _tab_tween != null and _tab_tween.is_valid():
+		_tab_tween.kill()
+	for view: Node in _content.get_children():
+		var control: Control = view
+		control.position = Vector2.ZERO
+		control.modulate.a = 1.0
+		if not control.visible or direction == 0.0:
+			continue
+		var seconds: float = Economy.anim_f("tab_seconds")
+		_tab_tween = create_tween().set_parallel()
+		control.position.x = direction * Economy.anim_f("tab_slide")
+		control.modulate.a = 0.0
+		_tab_tween.tween_property(control, "position:x", 0.0, seconds).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		_tab_tween.tween_property(control, "modulate:a", 1.0, seconds)
+
+
 func _on_currencies(coins: int, seeds: int, feed: int) -> void:
+	_roll_counter("coins", coins)
+	_roll_counter("seeds", seeds)
+	_roll_counter("feed", feed)
+
+
+## Rolls the displayed number towards `value`; a gain also flashes the chip.
+func _roll_counter(key: String, value: int) -> void:
+	if not _shown.has(key):
+		_shown[key] = value
+		_set_counter(float(value), key)
+		return
+	var from: int = int(_shown[key])
+	if from == value:
+		_set_counter(float(value), key)
+		return
+	var old: Variant = _counter_tweens.get(key, null)
+	if old is Tween and (old as Tween).is_valid():
+		(old as Tween).kill()
+	var tween: Tween = create_tween()
+	_counter_tweens[key] = tween
+	tween.tween_method(_set_counter.bind(key), float(from), float(value), Economy.anim_f("counter_seconds")) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if value > from:
+		UiFx.flash(_counter_label(key))
+
+
+func _set_counter(shown: float, key: String) -> void:
+	var value: int = roundi(shown)
+	_shown[key] = value
 	var cap: int = GameState.storage_cap()
-	_coins.text = "Монеты\n%d" % coins
-	_seeds.text = "Семена\n%d/%d" % [seeds, cap]
-	_feed.text = "Корм\n%d/%d" % [feed, cap]
+	if key == "coins":
+		_coins.text = "Монеты\n%d" % value
+	elif key == "seeds":
+		_seeds.text = "Семена\n%d/%d" % [value, cap]
+	else:
+		_feed.text = "Корм\n%d/%d" % [value, cap]
+
+
+func _counter_label(key: String) -> Label:
+	if key == "coins":
+		return _coins
+	return _seeds if key == "seeds" else _feed
 
 
 func _on_xp(level: int, xp_in_level: int, xp_needed: int) -> void:
 	_level.text = "Уровень %d" % level
-	_xp_bar.max_value = maxf(float(xp_needed), 1.0)
-	_xp_bar.value = _xp_bar.max_value if xp_needed <= 0 else float(xp_in_level)
+	var target_max: float = maxf(float(xp_needed), 1.0)
+	var target: float = target_max if xp_needed <= 0 else float(xp_in_level)
+	if _xp_tween != null and _xp_tween.is_valid():
+		_xp_tween.kill()
+	if _shown_level == 0:
+		_xp_bar.max_value = target_max
+		_xp_bar.value = target
+	else:
+		_xp_tween = create_tween()
+		if level > _shown_level:
+			# Fill the old bar to the end, then start the new level from empty.
+			_xp_tween.tween_property(_xp_bar, "value", _xp_bar.max_value, Economy.anim_f("xp_bar_seconds") * 0.5)
+			_xp_tween.tween_callback(func() -> void:
+				_xp_bar.max_value = target_max
+				_xp_bar.value = 0.0)
+			UiFx.flash(_level)
+		else:
+			_xp_bar.max_value = target_max
+		_xp_tween.tween_property(_xp_bar, "value", target, Economy.anim_f("xp_bar_seconds")) \
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_shown_level = level
 
 
 func _on_neighbors() -> void:
@@ -108,8 +197,8 @@ func _on_modal_requested(modal_id: String, payload: Dictionary) -> void:
 func _on_modal_close() -> void:
 	if _modal_stack.is_empty():
 		return
-	var top: Node = _modal_stack.pop_back()
-	top.queue_free()
+	var top: ModalScript = _modal_stack.pop_back()
+	top.dismiss()
 
 
 func _on_welcome_back(summary: Dictionary) -> void:
@@ -126,10 +215,13 @@ func _on_ad_failed(kind: String, reason: String) -> void:
 
 func _show_toast(text: String) -> void:
 	_toast.text = text
-	_toast.modulate.a = 1.0
 	if _toast_tween != null and _toast_tween.is_valid():
 		_toast_tween.kill()
 	_toast_tween = create_tween()
+	var seconds: float = Economy.anim_f("toast_in_seconds")
+	_toast.scale = Vector2.ONE * Economy.anim_f("modal_from_scale")
+	_toast_tween.tween_property(_toast, "modulate:a", 1.0, seconds * 0.6)
+	_toast_tween.parallel().tween_property(_toast, "scale", Vector2.ONE, seconds).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_toast_tween.tween_interval(Economy.ui_f("toast_seconds"))
 	_toast_tween.tween_property(_toast, "modulate:a", 0.0, Economy.ui_f("toast_fade_seconds"))
 

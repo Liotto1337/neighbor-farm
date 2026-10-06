@@ -13,6 +13,7 @@ signal currencies_changed(coins: int, seeds: int, feed: int)
 signal xp_changed(level: int, xp_in_level: int, xp_needed: int)
 signal level_up(new_level: int)
 signal tiles_changed
+signal field_expanded(side: int)
 signal selected_crop_changed(crop_id: String)
 signal inventory_changed
 signal animals_changed

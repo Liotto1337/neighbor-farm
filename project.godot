@@ -19,6 +19,7 @@ GameState="*res://autoload/GameState.gd"
 SaveManager="*res://autoload/SaveManager.gd"
 IAP="*res://autoload/IAP.gd"
 AdManager="*res://autoload/AdManager.gd"
+UiFx="*res://autoload/UiFx.gd"
 
 [debug]
 

@@ -11,6 +11,6 @@
 Web / Android (рендерер GL Compatibility). В пресете экспорта добавьте `data/*.json` в «Фильтры для экспорта не-ресурсных файлов».
 
 ## Структура
-- `autoload/` — Signals, GameState, SaveManager, TimeService, Economy, NeighborAI, IAP (заглушка), AdManager (заглушка)
-- `data/` — весь баланс в JSON
+- `autoload/` — Signals, GameState, SaveManager, TimeService, Economy, NeighborAI, IAP (заглушка), AdManager (заглушка), UiFx (анимации интерфейса)
+- `data/` — весь баланс в JSON. Размер поля по уровням — `config.json` → `field_sizes` (4×4 на старте, 10×10 на 15 уровне), тайминги анимаций — `config.json` → `anim`
 - `scenes/` — Main + 5 вкладок, компоненты (Tile, Modal, ContractRow)

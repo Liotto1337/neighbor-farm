@@ -101,6 +101,10 @@ func ui_f(key: String) -> float:
 	return float(cfg_dict("ui").get(key, 0.0))
 
 
+func anim_f(key: String) -> float:
+	return float(cfg_dict("anim").get(key, 0.0))
+
+
 func color(key: String) -> Color:
 	return Color.from_string(str(cfg_dict("colors").get(key, "")), Color.MAGENTA)
 
@@ -163,6 +167,30 @@ func building_param(building_id: String, key: String) -> float:
 
 func storage_cap(silo_level: int) -> int:
 	return cfg_i("storage_base") + silo_level * int(building_param("silo", "storage_per_level"))
+
+
+# --- Farm field ---
+
+## Side of the open (square) part of the field at a level; the full grid opens at the last step.
+func field_side(at_level: int) -> int:
+	var grid: int = cfg_i("grid_size")
+	var steps: Array = _array_of(config, "field_sizes")
+	if steps.is_empty():
+		return grid
+	var side: int = int(steps[0].get("side", grid))
+	for step: Variant in steps:
+		if at_level >= int(step.get("level", 1)):
+			side = maxi(side, int(step.get("side", 0)))
+	return clampi(side, 1, grid)
+
+
+## Next field expansion after a level: {"level", "side"}, or {} when the field is already full.
+func next_field_step(at_level: int) -> Dictionary:
+	var current: int = field_side(at_level)
+	for step: Variant in _array_of(config, "field_sizes"):
+		if int(step.get("level", 1)) > at_level and int(step.get("side", 0)) > current:
+			return {"level": int(step["level"]), "side": mini(int(step["side"]), cfg_i("grid_size"))}
+	return {}
 
 
 # --- Animals ---

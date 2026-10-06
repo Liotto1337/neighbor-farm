@@ -274,6 +274,7 @@ func _add_xp(amount: int) -> void:
 	if amount <= 0:
 		return
 	xp += amount
+	var old_side: int = field_side()
 	var gained: int = 0
 	while level < Economy.max_level() and xp >= Economy.xp_for_level(level + 1):
 		level += 1
@@ -281,8 +282,14 @@ func _add_xp(amount: int) -> void:
 	if gained > 0:
 		coins += Economy.level_up_coins() * gained
 		_emit_currencies()
-		_toast("Новый уровень %d! +%d монет" % [level, Economy.level_up_coins() * gained])
+		var text: String = "Новый уровень %d! +%d монет" % [level, Economy.level_up_coins() * gained]
+		var side: int = field_side()
+		if side > old_side:
+			text += "\nПоле расширено до %d×%d" % [side, side]
+		_toast(text)
 		Signals.level_up.emit(level)
+		if side > old_side:
+			Signals.field_expanded.emit(side)
 	_emit_xp()
 
 
@@ -319,6 +326,18 @@ func tile(index: int) -> Dictionary:
 	return tiles[index]
 
 
+## Side of the open square of the field (top-left corner of the full grid_size grid).
+func field_side() -> int:
+	return Economy.field_side(level)
+
+
+@warning_ignore("integer_division")
+func is_tile_open(index: int) -> bool:
+	var grid: int = Economy.cfg_i("grid_size")
+	var side: int = field_side()
+	return index >= 0 and index < tiles.size() and index / grid < side and index % grid < side
+
+
 func tile_state(index: int) -> int:
 	return int(tile(index).get("s", TileState.EMPTY))
 
@@ -342,8 +361,8 @@ func tile_seconds_left(index: int, now: float) -> float:
 
 func count_tiles(state: int) -> int:
 	var count: int = 0
-	for t: Variant in tiles:
-		if int(t["s"]) == state:
+	for i: int in tiles.size():
+		if int(tiles[i]["s"]) == state and is_tile_open(i):
 			count += 1
 	return count
 
@@ -357,7 +376,7 @@ func select_crop(crop_id: String) -> void:
 
 
 func plow(index: int) -> bool:
-	if tile_state(index) != TileState.EMPTY:
+	if not is_tile_open(index) or tile_state(index) != TileState.EMPTY:
 		return false
 	tiles[index] = _empty_tile(TileState.PLOWED)
 	Signals.tiles_changed.emit()
@@ -365,7 +384,7 @@ func plow(index: int) -> bool:
 
 
 func clear_tile(index: int) -> bool:
-	if tile_state(index) != TileState.WITHERED:
+	if not is_tile_open(index) or tile_state(index) != TileState.WITHERED:
 		return false
 	tiles[index] = _empty_tile(TileState.EMPTY)
 	Signals.tiles_changed.emit()
@@ -373,7 +392,7 @@ func clear_tile(index: int) -> bool:
 
 
 func plant(index: int, crop_id: String) -> bool:
-	if tile_state(index) != TileState.PLOWED or not _can_plant(crop_id):
+	if not is_tile_open(index) or tile_state(index) != TileState.PLOWED or not _can_plant(crop_id):
 		return false
 	_plant_tile(index, crop_id, TimeService.now())
 	Signals.tiles_changed.emit()
@@ -385,7 +404,7 @@ func plant_all(crop_id: String) -> int:
 	var now: float = TimeService.now()
 	var count: int = 0
 	for i: int in tiles.size():
-		if tile_state(i) != TileState.PLOWED:
+		if tile_state(i) != TileState.PLOWED or not is_tile_open(i):
 			continue
 		if not _can_plant(crop_id):
 			break
@@ -422,7 +441,7 @@ func _plant_tile(index: int, crop_id: String, now: float) -> void:
 
 
 func harvest(index: int) -> bool:
-	if tile_state(index) != TileState.READY or not _harvest_tile(index):
+	if not is_tile_open(index) or tile_state(index) != TileState.READY or not _harvest_tile(index):
 		return false
 	Signals.tiles_changed.emit()
 	Signals.inventory_changed.emit()
@@ -432,7 +451,7 @@ func harvest(index: int) -> bool:
 func harvest_all() -> int:
 	var count: int = 0
 	for i: int in tiles.size():
-		if tile_state(i) == TileState.READY and _harvest_tile(i):
+		if tile_state(i) == TileState.READY and is_tile_open(i) and _harvest_tile(i):
 			count += 1
 	if count > 0:
 		Signals.tiles_changed.emit()
