@@ -2,9 +2,11 @@ extends Button
 ## One farm tile. Pure view: renders a tile dictionary, reports taps via Signals.
 ## Drawn as a raised block seen from above at an angle: a square textured top face lit from
 ## the top-left, a front side and a left/right side (per ui.tile_side sign) with layered dirt,
-## a drop shadow, and upright plants that may overlap the row above (later rows draw on top).
+## a drop shadow, and an upright crop sprite per crop and growth stage (CropArt) that may
+## overlap the row above (later rows draw on top).
 
 const TileArt = preload("res://scenes/components/TileArt.gd")
+const CropArt = preload("res://scenes/components/CropArt.gd")
 
 const CENTER: float = 0.5
 const FRONT_LIGHT: float = 0.8
@@ -24,19 +26,11 @@ const DROP_COLOR: Color = Color(0.0, 0.0, 0.0, 0.32)
 const READY_RIM_ALPHA: float = 0.7
 const PLANT_BASE_Y: float = 0.55
 const SHADOW_SQUASH: float = 0.35
+const PLANT_SHADOW: float = 0.2
+const READY_GLOW: float = 0.4
+## Progress at which a growing crop switches to the YOUNG and UNRIPE sprites.
+const STAGE_PROGRESS: Array[float] = [0.25, 0.6]
 const SHADOW_ALPHA: float = 0.32
-const STEM_WIDTH: float = 3.0
-const LEAF_LEN: float = 0.45
-const LEAF_WIDTH: float = 0.18
-const LEAF_SHADE: float = 0.22
-const LEAF_LIGHT: float = 0.12
-const FRUIT_FROM_PROGRESS: float = 0.5
-const FRUIT_RADIUS: float = 0.22
-const FRUIT_OUTLINE: float = 0.45
-const FRUIT_SHADE: float = 0.3
-const FRUIT_BODY: float = 0.78
-const FRUIT_BODY_SHIFT: float = 0.16
-const HIGHLIGHT_ALPHA: float = 0.75
 const READY_GLOW_ALPHA: float = 0.45
 const CIRCLE_SEGMENTS: int = 20
 const BAR_HEIGHT: float = 7.0
@@ -50,8 +44,7 @@ var _left_px: float = 0.0
 var _variant: int = 0
 var _state: int = -1
 var _progress: float = 0.0
-var _crop_color: Color = Color.WHITE
-var _has_crop: bool = false
+var _plant_tex: Texture2D = null
 var _top_tex: Texture2D = null
 var _side_tex: Texture2D = null
 
@@ -86,8 +79,7 @@ func render(t: Dictionary, progress: float) -> void:
 		_state = state
 		_top_tex = TileArt.top(_art_kind(state), _soil_color(state), _variant, int(_size_px))
 	_progress = progress
-	_has_crop = _state >= GameState.TileState.PLANTED and not def.is_empty()
-	_crop_color = Color.from_string(str(def.get("color", "")), Color.WHITE)
+	_plant_tex = _plant_texture(def)
 	_bar.visible = _state == GameState.TileState.PLANTED
 	_bar.value = progress
 	queue_redraw()
@@ -97,7 +89,7 @@ func _draw() -> void:
 	if _top_tex == null:
 		return
 	_draw_block()
-	if _has_crop:
+	if _plant_tex != null:
 		_draw_plant()
 
 
@@ -156,46 +148,28 @@ func _silhouette(tl: Vector2, tr: Vector2, br: Vector2, bl: Vector2, shift: Vect
 
 
 func _draw_plant() -> void:
-	var withered: bool = _state == GameState.TileState.WITHERED
-	var min_f: float = Economy.ui_f("crop_min_fraction")
-	var max_f: float = Economy.ui_f("crop_max_fraction")
-	var height: float = _size_px * lerpf(min_f, max_f, _progress)
 	var base: Vector2 = Vector2(_left_px + _size_px * CENTER, _size_px * PLANT_BASE_Y)
-	var top: Vector2 = base + Vector2(0.0, -height)
-	var leaf_color: Color = Economy.color("withered") if withered else Economy.color("leaf")
-
+	var width: float = _plant_tex.get_width() / float(CropArt.SUPERSAMPLE)
+	var height: float = _plant_tex.get_height() / float(CropArt.SUPERSAMPLE)
 	if _state == GameState.TileState.READY:
-		_draw_ellipse(base, height * CENTER, _with_alpha(Economy.color("ready_text"), READY_GLOW_ALPHA))
-	_draw_ellipse(base, height * CENTER * CENTER, Color(0.0, 0.0, 0.0, SHADOW_ALPHA))
-
-	var droop: float = 1.0 if withered else -1.0
-	draw_line(base, top, leaf_color.darkened(LEAF_SHADE), STEM_WIDTH, true)
-	var leaf_root: Vector2 = base.lerp(top, CENTER)
-	_draw_leaf(leaf_root, Vector2(-1.0, droop * CENTER).normalized(), height, leaf_color)
-	_draw_leaf(leaf_root, Vector2(1.0, droop * CENTER).normalized(), height, leaf_color)
-
-	if withered or _progress < FRUIT_FROM_PROGRESS:
-		return
-	var radius: float = _size_px * FRUIT_RADIUS * inverse_lerp(FRUIT_FROM_PROGRESS, 1.0, _progress)
-	var light_dir: Vector2 = Vector2(-1.0, -1.0) * radius
-	_fill_circle(top, radius + 1.0, _crop_color.darkened(FRUIT_OUTLINE))
-	_fill_circle(top, radius, _crop_color.darkened(FRUIT_SHADE))
-	_fill_circle(top + light_dir * FRUIT_BODY_SHIFT, radius * FRUIT_BODY, _crop_color)
-	_fill_circle(top + light_dir * CENTER * CENTER * 1.5, radius * CENTER * CENTER, _with_alpha(Color.WHITE, HIGHLIGHT_ALPHA))
+		_draw_ellipse(base, width * READY_GLOW, _with_alpha(Economy.color("ready_text"), READY_GLOW_ALPHA))
+	_draw_ellipse(base, width * PLANT_SHADOW, Color(0.0, 0.0, 0.0, SHADOW_ALPHA))
+	draw_texture_rect(_plant_tex, Rect2(base - CropArt.ANCHOR, Vector2(width, height)), false)
 
 
-## Two-tone leaf: the half facing the light is brighter, with a darker midrib.
-func _draw_leaf(root: Vector2, dir: Vector2, height: float, color: Color) -> void:
-	var tip: Vector2 = root + dir * height * LEAF_LEN
-	var side: Vector2 = dir.orthogonal() * height * LEAF_WIDTH
-	var mid: Vector2 = root.lerp(tip, CENTER)
-	var upper: Vector2 = mid - side if side.y > 0.0 else mid + side
-	var lower: Vector2 = mid + side if side.y > 0.0 else mid - side
-	var outline: PackedVector2Array = PackedVector2Array([root, upper, tip, lower, root])
-	draw_colored_polygon(PackedVector2Array([root, upper, tip]), color.lightened(LEAF_LIGHT))
-	draw_colored_polygon(PackedVector2Array([root, tip, lower]), color.darkened(LEAF_SHADE * CENTER))
-	draw_polyline(outline, color.darkened(LEAF_SHADE), 1.0, true)
-	draw_line(root, tip, color.darkened(LEAF_SHADE), 1.0, true)
+## Growth stage sprite for the crop on this tile (null when nothing grows here).
+func _plant_texture(def: Dictionary) -> Texture2D:
+	if _state < GameState.TileState.PLANTED or def.is_empty():
+		return null
+	var stage: int = CropArt.Stage.RIPE
+	if _state == GameState.TileState.PLANTED:
+		stage = CropArt.Stage.SPROUT
+		for threshold: float in STAGE_PROGRESS:
+			if _progress >= threshold:
+				stage += 1
+	var fruit: Color = Color.from_string(str(def.get("color", "")), Color.WHITE)
+	var sprite: String = str(def.get("sprite", def.get("id", "")))
+	return CropArt.texture(sprite, stage, _state == GameState.TileState.WITHERED, fruit, Economy.color("leaf"), Economy.color("withered"))
 
 
 func _draw_ellipse(center: Vector2, radius: float, color: Color) -> void:
